@@ -1,0 +1,40 @@
+"""
+Service configuration using Pydantic Settings
+"""
+from pydantic_settings import BaseSettings
+from pydantic import Field
+from typing import List
+
+
+class Settings(BaseSettings):
+    """Settings for patient-service"""
+
+    # Service info
+    service_name: str = Field(default="patient-service", env="SERVICE_NAME")
+    environment: str = Field(default="development", env="ENVIRONMENT")
+    port: int = Field(default=8002, env="PORT")
+
+    # Database
+    database_url: str = Field(..., env="DATABASE_URL")
+    db_echo: bool = Field(default=False, env="DB_ECHO")
+
+    # CORS
+    cors_origins: List[str] = Field(
+        default=["http://localhost:3000", "http://localhost:8080", "http://localhost:8000"],
+        env="CORS_ORIGINS"
+    )
+
+    # Service URLs
+    order_service_url: str = Field(default="http://localhost:8004", env="ORDER_SERVICE_URL")
+
+    # Logging
+    log_level: str = Field(default="INFO", env="LOG_LEVEL")
+
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+        case_sensitive = False
+
+
+# Singleton
+settings = Settings()
