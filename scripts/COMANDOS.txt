@@ -1,0 +1,158 @@
+================================================================================
+  COMANDOS RAPIDOS - Sistema de Laboratorio Clinico
+================================================================================
+
+SCRIPTS DISPONIBLES (doble clic o desde CMD):
+----------------------------------------------
+  start.bat         - Inicia todos los servicios
+  stop.bat          - Detiene todos los servicios
+  restart.bat       - Reinicia servicios
+  status.bat        - Muestra el estado
+  logs.bat          - Muestra logs en tiempo real
+  build.bat         - Construye las imagenes
+  db-only.bat       - Solo inicia las bases de datos
+  shell.bat         - Abre shell en un contenedor
+  clean.bat         - Limpia todo (⚠️ BORRA DATOS)
+
+================================================================================
+FLUJO DE TRABAJO TIPICO
+================================================================================
+
+PRIMERA VEZ (Setup inicial):
+-----------------------------
+1. build.bat
+2. start.bat
+3. status.bat
+
+DESARROLLO DIARIO:
+------------------
+1. start.bat              (iniciar servicios)
+2. logs.bat user-service  (ver logs de un servicio)
+3. restart.bat user-service  (reiniciar después de cambios)
+4. stop.bat               (al terminar)
+
+SOLO DESARROLLO LOCAL (sin Docker en servicios):
+------------------------------------------------
+1. db-only.bat            (solo bases de datos en Docker)
+2. Luego ejecuta cada servicio manualmente:
+   cd user-service
+   uvicorn src.main:app --reload --port 8001
+
+================================================================================
+EJEMPLOS DE USO
+================================================================================
+
+Iniciar todo el sistema:
+  start.bat
+
+Ver logs de un servicio específico:
+  logs.bat user-service
+  logs.bat patient-service
+
+Ver logs de TODOS los servicios:
+  logs.bat
+
+Reiniciar un servicio después de cambios:
+  restart.bat user-service
+
+Entrar al shell de un servicio:
+  shell.bat user-service       (shell del contenedor)
+  shell.bat user-db            (conectar a PostgreSQL)
+
+Ver estado de todo:
+  status.bat
+
+Reconstruir un servicio:
+  build.bat user-service
+  restart.bat user-service
+
+Limpiar todo y empezar de cero:
+  clean.bat     (⚠️ ELIMINA DATOS)
+  build.bat
+  start.bat
+
+================================================================================
+COMANDOS DOCKER COMPOSE DIRECTOS (Alternativa)
+================================================================================
+
+docker-compose up -d                    (iniciar)
+docker-compose down                     (detener)
+docker-compose logs -f user-service     (ver logs)
+docker-compose build user-service       (reconstruir)
+docker-compose restart user-service     (reiniciar)
+docker-compose ps                       (estado)
+docker-compose exec user-service bash   (shell)
+
+================================================================================
+PUERTOS
+================================================================================
+
+API Gateway:           http://localhost:8000
+User Service:          http://localhost:8001
+Patient Service:       http://localhost:8002
+Order Service:         http://localhost:8003
+Billing Service:       http://localhost:8004
+Configuration Service: http://localhost:8005
+
+user-db:      localhost:5432 (postgres/1234)
+patient-db:   localhost:5433 (postgres/1234)
+order-db:     localhost:5434 (postgres/1234)
+billing-db:   localhost:5435 (postgres/1234)
+config-db:    localhost:5436 (postgres/1234)
+
+================================================================================
+HEALTH CHECKS
+================================================================================
+
+curl http://localhost:8000/health   (API Gateway)
+curl http://localhost:8001/health   (User Service)
+curl http://localhost:8002/health   (Patient Service)
+curl http://localhost:8003/health   (Order Service)
+curl http://localhost:8004/health   (Billing Service)
+curl http://localhost:8005/health   (Configuration Service)
+
+================================================================================
+DOCUMENTACION SWAGGER
+================================================================================
+
+http://localhost:8000/docs   (API Gateway)
+http://localhost:8001/docs   (User Service)
+http://localhost:8002/docs   (Patient Service)
+http://localhost:8003/docs   (Order Service)
+http://localhost:8004/docs   (Billing Service)
+http://localhost:8005/docs   (Configuration Service)
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Error: "Cannot start service..."
+  stop.bat
+  clean.bat
+  build.bat
+  start.bat
+
+Base de datos no responde:
+  logs.bat user-db
+  restart.bat user-db
+
+Puerto ya en uso:
+  status.bat
+  netstat -ano | findstr :8001
+
+Cambios no se reflejan:
+  build.bat user-service
+  restart.bat user-service
+
+================================================================================
+NOTAS IMPORTANTES
+================================================================================
+
+⚠️  clean.bat ELIMINA TODOS LOS DATOS de la base de datos
+📝  Los logs se guardan también en <servicio>/logs/
+🔑  Credenciales BD: postgres / 1234
+🔐  Secret Key en .env (cambiar en producción)
+
+================================================================================
+Última actualización: 19 de noviembre de 2025
+================================================================================

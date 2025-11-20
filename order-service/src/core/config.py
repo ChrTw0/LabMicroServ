@@ -18,7 +18,9 @@ class Settings(BaseSettings):
     db_echo: bool = Field(default=False, env="DB_ECHO")
     
     # Security
-    secret_key: str = Field(..., env="SECRET_KEY")
+    secret_key: str = Field(default="default-secret", env="SECRET_KEY")
+    jwt_algorithm: str = Field(default="HS256", env="JWT_ALGORITHM")
+    access_token_expire_minutes: int = Field(default=30, env="ACCESS_TOKEN_EXPIRE_MINUTES")
 
     # CORS
     cors_origins: List[str] = Field(
@@ -29,8 +31,8 @@ class Settings(BaseSettings):
     # Service URLs
     patient_service_url: str = Field(default="http://localhost:8002", env="PATIENT_SERVICE_URL")
     user_service_url: str = Field(default="http://localhost:8001", env="USER_SERVICE_URL")
-    billing_service_url: str = Field(default="http://localhost:8005", env="BILLING_SERVICE_URL")
-    notification_service_url: str = Field(default="http://localhost:8006", env="NOTIFICATION_SERVICE_URL")
+    billing_service_url: str = Field(default="http://localhost:8004", env="BILLING_SERVICE_URL")
+    configuration_service_url: str = Field(default="http://localhost:8005", env="CONFIGURATION_SERVICE_URL")
 
     # Logging
     log_level: str = Field(default="INFO", env="LOG_LEVEL")

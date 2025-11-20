@@ -1,0 +1,272 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # BASES DE DATOS POSTGRESQL
+  # ============================================
+
+  # User Database
+  user-db:
+    image: postgres:15-alpine
+    container_name: labmic_user_db
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "5432:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    networks:
+      - labmic-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d user_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Patient Database
+  patient-db:
+    image: postgres:15-alpine
+    container_name: labmic_patient_db
+    environment:
+      POSTGRES_DB: patient_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "5433:5432"
+    volumes:
+      - patient_db_data:/var/lib/postgresql/data
+    networks:
+      - labmic-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d patient_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Order Database
+  order-db:
+    image: postgres:15-alpine
+    container_name: labmic_order_db
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "5434:5432"
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+    networks:
+      - labmic-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d order_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Billing Database
+  billing-db:
+    image: postgres:15-alpine
+    container_name: labmic_billing_db
+    environment:
+      POSTGRES_DB: billing_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "5435:5432"
+    volumes:
+      - billing_db_data:/var/lib/postgresql/data
+    networks:
+      - labmic-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d billing_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Configuration Database
+  config-db:
+    image: postgres:15-alpine
+    container_name: labmic_config_db
+    environment:
+      POSTGRES_DB: config_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "5436:5432"
+    volumes:
+      - config_db_data:/var/lib/postgresql/data
+    networks:
+      - labmic-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d config_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # MICROSERVICIOS
+  # ============================================
+
+  # User Service
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: labmic_user_service
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:1234@user-db:5432/user_db
+      - SECRET_KEY=your-secret-key-change-this-in-production
+      - ENVIRONMENT=development
+      - SERVICE_NAME=user-service
+      - SERVICE_PORT=8001
+    ports:
+      - "8001:8001"
+    depends_on:
+      user-db:
+        condition: service_healthy
+    networks:
+      - labmic-network
+    volumes:
+      - ./user-service:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8001 --reload
+
+  # Patient Service
+  patient-service:
+    build:
+      context: ./patient-service
+      dockerfile: Dockerfile
+    container_name: labmic_patient_service
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:1234@patient-db:5432/patient_db
+      - SECRET_KEY=your-secret-key-change-this-in-production
+      - ENVIRONMENT=development
+      - SERVICE_NAME=patient-service
+      - SERVICE_PORT=8002
+    ports:
+      - "8002:8002"
+    depends_on:
+      patient-db:
+        condition: service_healthy
+    networks:
+      - labmic-network
+    volumes:
+      - ./patient-service:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8002 --reload
+
+  # Order Service
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: labmic_order_service
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:1234@order-db:5432/order_db
+      - SECRET_KEY=your-secret-key-change-this-in-production
+      - ENVIRONMENT=development
+      - SERVICE_NAME=order-service
+      - SERVICE_PORT=8003
+    ports:
+      - "8003:8003"
+    depends_on:
+      order-db:
+        condition: service_healthy
+    networks:
+      - labmic-network
+    volumes:
+      - ./order-service:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8003 --reload
+
+  # Billing Service
+  billing-service:
+    build:
+      context: ./billing-service
+      dockerfile: Dockerfile
+    container_name: labmic_billing_service
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:1234@billing-db:5432/billing_db
+      - SECRET_KEY=your-secret-key-change-this-in-production
+      - ENVIRONMENT=development
+      - SERVICE_NAME=billing-service
+      - SERVICE_PORT=8004
+    ports:
+      - "8004:8004"
+    depends_on:
+      billing-db:
+        condition: service_healthy
+    networks:
+      - labmic-network
+    volumes:
+      - ./billing-service:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8004 --reload
+
+  # Configuration Service
+  configuration-service:
+    build:
+      context: ./configuration-service
+      dockerfile: Dockerfile
+    container_name: labmic_configuration_service
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:1234@config-db:5432/config_db
+      - SECRET_KEY=your-secret-key-change-this-in-production
+      - ENVIRONMENT=development
+      - SERVICE_NAME=configuration-service
+      - SERVICE_PORT=8005
+    ports:
+      - "8005:8005"
+    depends_on:
+      config-db:
+        condition: service_healthy
+    networks:
+      - labmic-network
+    volumes:
+      - ./configuration-service:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8005 --reload
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: labmic_api_gateway
+    environment:
+      - ENVIRONMENT=development
+      - USER_SERVICE_URL=http://user-service:8001
+      - PATIENT_SERVICE_URL=http://patient-service:8002
+      - ORDER_SERVICE_URL=http://order-service:8003
+      - BILLING_SERVICE_URL=http://billing-service:8004
+      - CONFIGURATION_SERVICE_URL=http://configuration-service:8005
+      - SECRET_KEY=supersecretkey123456789012345678901234567890
+      - SERVICE_NAME=api-gateway
+      - PORT=8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - user-service
+      - patient-service
+      - order-service
+      - billing-service
+      - configuration-service
+    networks:
+      - labmic-network
+    volumes:
+      - ./api-gateway:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+
+# ============================================
+# VOLUMES
+# ============================================
+volumes:
+  user_db_data:
+  patient_db_data:
+  order_db_data:
+  billing_db_data:
+  config_db_data:
+
+# ============================================
+# NETWORKS
+# ============================================
+networks:
+  labmic-network:
+    driver: bridge

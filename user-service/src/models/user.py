@@ -4,7 +4,7 @@ Database: user_db
 """
 from datetime import datetime
 from typing import Optional, List
-from sqlalchemy import String, Boolean, Integer, DateTime, Text, Index
+from sqlalchemy import String, Boolean, Integer, DateTime, Text, Index, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
@@ -109,11 +109,11 @@ class UserRole(Base):
 
     # Foreign Keys
     user_id: Mapped[int] = mapped_column(
-        Integer,
+        ForeignKey("users.id"),
         nullable=False
     )
     role_id: Mapped[int] = mapped_column(
-        Integer,
+        ForeignKey("roles.id"),
         nullable=False
     )
 
@@ -141,7 +141,7 @@ class PasswordResetToken(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
     # Foreign Key
-    user_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
     # Datos
     token: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
@@ -174,7 +174,7 @@ class AuditLog(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
     # Foreign Key
-    user_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
 
     # Datos
     action: Mapped[str] = mapped_column(String(100), nullable=False, index=True)

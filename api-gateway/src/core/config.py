@@ -1,5 +1,5 @@
 """
-Service configuration using Pydantic Settings
+API Gateway configuration using Pydantic Settings
 """
 from pydantic_settings import BaseSettings
 from pydantic import Field
@@ -7,19 +7,15 @@ from typing import List
 
 
 class Settings(BaseSettings):
-    """Settings for patient-service"""
+    """Settings for api-gateway"""
 
     # Service info
-    service_name: str = Field(default="patient-service", env="SERVICE_NAME")
+    service_name: str = Field(default="api-gateway", env="SERVICE_NAME")
     environment: str = Field(default="development", env="ENVIRONMENT")
-    port: int = Field(default=8002, env="PORT")
+    port: int = Field(default=8000, env="PORT")
 
-    # Database
-    database_url: str = Field(..., env="DATABASE_URL")
-    db_echo: bool = Field(default=False, env="DB_ECHO")
-
-    # Security (aunque este servicio no maneje auth directamente)
-    secret_key: str = Field(default="default-secret", env="SECRET_KEY")
+    # Security
+    secret_key: str = Field(..., env="SECRET_KEY")
     jwt_algorithm: str = Field(default="HS256", env="JWT_ALGORITHM")
     access_token_expire_minutes: int = Field(default=30, env="ACCESS_TOKEN_EXPIRE_MINUTES")
 
@@ -31,7 +27,13 @@ class Settings(BaseSettings):
 
     # Service URLs
     user_service_url: str = Field(default="http://localhost:8001", env="USER_SERVICE_URL")
+    patient_service_url: str = Field(default="http://localhost:8002", env="PATIENT_SERVICE_URL")
+    order_service_url: str = Field(default="http://localhost:8003", env="ORDER_SERVICE_URL")
+    billing_service_url: str = Field(default="http://localhost:8004", env="BILLING_SERVICE_URL")
     configuration_service_url: str = Field(default="http://localhost:8005", env="CONFIGURATION_SERVICE_URL")
+
+    # Rate Limiting
+    rate_limit_per_minute: int = Field(default=100, env="RATE_LIMIT_PER_MINUTE")
 
     # Logging
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
