@@ -4,7 +4,7 @@ Database: patient_db
 """
 from datetime import datetime
 from typing import Optional, List
-from sqlalchemy import String, Boolean, Integer, DateTime, Text, Enum as SQLEnum, Index
+from sqlalchemy import String, Boolean, Integer, DateTime, Text, Enum as SQLEnum, Index, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 import enum
@@ -97,7 +97,7 @@ class PatientHistory(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
     # Foreign Key
-    patient_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"), nullable=False)
 
     # Referencia lógica a order_db.orders
     order_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
@@ -131,7 +131,7 @@ class PatientNote(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
     # Foreign Key
-    patient_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"), nullable=False)
 
     # Datos
     note: Mapped[str] = mapped_column(Text, nullable=False)

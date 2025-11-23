@@ -22,4 +22,4 @@ class LabSyncLog(Base):
     sync_status: Mapped[SyncStatus] = mapped_column(SQLEnum(SyncStatus, native_enum=False), default=SyncStatus.PENDING, index=True)
     attempt_count: Mapped[int] = mapped_column(Integer, default=0)
     synced_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-    order: Mapped["Order"] = relationship("Order", back_populates="lab_sync_log")
+    # order: Mapped["Order"] = relationship("Order", back_populates="lab_sync_log")  # Will be added when implementing F-13

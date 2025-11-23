@@ -81,7 +81,10 @@ async def health_check():
 
 
 # Import and include routers
-# from src.modules.billing.routers import invoices
+from src.modules.billing.router import router as invoice_router
+
+app.include_router(invoice_router)
+
+# Future routers:
 # from src.modules.reconciliation.routers import closures
-# app.include_router(invoices.router, prefix="/api/v1/invoices", tags=["Invoices"])
 # app.include_router(closures.router, prefix="/api/v1/closures", tags=["Daily Closures"])

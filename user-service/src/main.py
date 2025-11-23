@@ -81,5 +81,9 @@ async def health_check():
 
 # Import and include routers
 from src.routers.auth import router as auth_router
+from src.routers.user import router as user_router
+from src.routers.role import router as role_router
 
 app.include_router(auth_router)
+app.include_router(user_router)
+app.include_router(role_router)

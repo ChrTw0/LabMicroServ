@@ -106,8 +106,11 @@ desktop.ini
 docs/_build/
 site/
 
-# Migration files (uncomment if needed)
-# alembic/versions/*.py
+# Migration files - KEEP THESE IN GIT!
+# Las migraciones SÍ van al repositorio
+# Solo ignorar el cache de alembic si existe
+alembic/__pycache__/
+alembic/versions/__pycache__/
 
 # Secrets and certificates
 *.pem
@@ -160,3 +163,79 @@ cython_debug/
 config/local.py
 settings/local.py
 local_settings.py
+
+# =====================================================
+# PROYECTO ESPECÍFICO - Lab Microservices
+# =====================================================
+
+# Datos de seed (opcional - depende si quieres versionar datos de prueba)
+# seed_data.py se mantiene en git, pero puedes ignorar datos generados
+**/data/seed/
+**/exports/
+
+# Logs de servicios (ya están en logs/ arriba, pero por si acaso)
+user-service/logs/
+patient-service/logs/
+order-service/logs/
+billing-service/logs/
+configuration-service/logs/
+api-gateway/logs/
+
+# Archivos generados por servicios
+**/generated/
+**/temp/
+**/uploads/
+**/downloads/
+
+# Base de datos local (si usas SQLite para testing)
+**/test.db
+**/dev.db
+
+# Certificados y credenciales específicas de SUNAT
+**/sunat_credentials/
+**/certificados_sunat/
+*.pfx
+*.p12
+
+# Backups de base de datos
+**/backups/
+*.sql
+*.dump
+pg_dump_*
+
+# Archivos de configuración locales con secrets
+docker-compose.override.yml
+docker-compose.local.yml
+.env.production
+.env.staging
+
+# Cache de Redis (si se persiste localmente)
+dump.rdb
+appendonly.aof
+
+# Archivos temporales de Excel/PDF generados
+**/reports/*.xlsx
+**/reports/*.pdf
+**/invoices/*.pdf
+**/invoices/*.xml
+!**/invoices/templates/  # Mantener templates en git
+
+# Volúmenes de Docker (datos persistentes)
+.docker/
+volumes/
+postgres-data/
+redis-data/
+rabbitmq-data/
+
+# Archivos de monitoreo y profiling
+*.pprof
+*.trace
+
+# Archivos de testing con datos sensibles
+**/test_data/real/
+**/fixtures/production/
+
+# Archivos de IDEs específicos del equipo
+.fleet/
+.idea/workspace.xml
+.idea/tasks.xml

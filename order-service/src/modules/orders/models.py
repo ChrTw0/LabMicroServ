@@ -34,7 +34,7 @@ class Order(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     items: Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
     payments: Mapped[List["OrderPayment"]] = relationship("OrderPayment", back_populates="order", cascade="all, delete-orphan")
-    lab_sync_log: Mapped["LabSyncLog"] = relationship("LabSyncLog", back_populates="order", uselist=False)
+    # lab_sync_log: Mapped["LabSyncLog"] = relationship("LabSyncLog", back_populates="order", uselist=False)  # Will be added when implementing F-13
 
 class OrderItem(Base):
     __tablename__ = "order_items"

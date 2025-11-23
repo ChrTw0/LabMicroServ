@@ -81,9 +81,11 @@ async def health_check():
 
 
 # Import and include routers
-# from src.modules.catalog.routers import catalog
-# from src.modules.orders.routers import orders
-# from src.modules.lab_integration.routers import lab_sync
-# app.include_router(catalog.router, prefix="/api/v1/catalog", tags=["Catalog"])
-# app.include_router(orders.router, prefix="/api/v1/orders", tags=["Orders"])
-# app.include_router(lab_sync.router, prefix="/api/v1/lab-sync", tags=["Lab Integration"])
+from src.modules.catalog.router import category_router, service_router
+from src.modules.orders.router import router as order_router
+from src.modules.lab_integration.router import router as lab_sync_router
+
+app.include_router(category_router)
+app.include_router(service_router)
+app.include_router(order_router)
+app.include_router(lab_sync_router)
