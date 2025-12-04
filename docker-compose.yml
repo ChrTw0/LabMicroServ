@@ -254,6 +254,34 @@ services:
       - ./api-gateway:/app
     command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
+  # ============================================
+  # FRONTEND - MODO DESARROLLO (HOT RELOAD)
+  # **USAR ESTE BLOQUE PARA DESARROLLO RÁPIDO**
+  # ============================================
+  frontend-dev:
+    # Usa el Dockerfile de desarrollo
+    build:
+      context: ./frontend/dashboard
+      dockerfile: Dockerfile.dev 
+    container_name: labmic_frontend_dev
+    environment:
+      - PORT=8081
+      - CHOKIDAR_USEPOLLING=true # Activa el hot reload en el volumen
+    ports:
+      # Mapea tu puerto 3000 al puerto de desarrollo estándar de Expo (8081)
+      - "3000:8081" 
+    networks:
+      - labmic-network
+    volumes:
+      # 1. Monta tu código fuente (para hot reload)
+      - ./frontend/dashboard:/app 
+      # 2. Monta la carpeta node_modules del contenedor (para usar las dependencias instaladas)
+      - /app/node_modules 
+    # 3. EL COMANDO SÓLO INICIA EL SERVIDOR DE DESARROLLO
+    command: sh -c "npm cache clean --force && npm start --web --reset-cache"
+    depends_on: 
+      - api-gateway
+
 # ============================================
 # VOLUMES
 # ============================================
