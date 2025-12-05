@@ -254,6 +254,23 @@ services:
       - ./api-gateway:/app
     command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
+  # Frontend Service (React App)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: labmic_frontend
+    ports:
+      - "5173:80" # Mapeamos el puerto 5173 del host al 80 del contenedor Nginx
+    depends_on:
+      - api-gateway
+    networks:
+      - labmic-network
+    # No se necesita volume mount para producción,
+    # pero es útil para desarrollo si quieres hot-reloading dentro de Docker.
+    # volumes:
+    #   - ./frontend:/app
+
 # ============================================
 # VOLUMES
 # ============================================

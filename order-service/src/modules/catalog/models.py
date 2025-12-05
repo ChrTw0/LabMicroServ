@@ -1,36 +1,51 @@
-"""
-Catalog Models
-"""
-from sqlalchemy import String, Boolean, Integer, DateTime, Numeric, Text, Index, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.sql import func
-from datetime import datetime
-from decimal import Decimal
-from typing import Optional, List
-
+from sqlalchemy import (Column, Integer, String, Boolean, Numeric, Text,
+                        ForeignKey, DateTime, func)
+from sqlalchemy.orm import relationship
 from src.core.database import Base
 
 class Category(Base):
-    __tablename__ = "categories"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    services: Mapped[List["Service"]] = relationship("Service", back_populates="category")
+    __tablename__ = "catalog_categories"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False, unique=True)
+    description = Column(Text)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
 
-class Service(Base):
-    __tablename__ = "services"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=False)
-    current_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    category: Mapped["Category"] = relationship("Category", back_populates="services")
+    tests = relationship("Test", back_populates="category")
 
-class PriceHistory(Base):
-    __tablename__ = "price_history"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    service_id: Mapped[int] = mapped_column(ForeignKey("services.id"), nullable=False)
-    old_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    new_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+class SampleType(Base):
+    __tablename__ = "catalog_sample_types"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False, unique=True)
+    description = Column(Text)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
+
+    tests = relationship("Test", back_populates="sample_type")
+
+class Test(Base):
+    __tablename__ = "catalog_tests"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False, index=True)
+    code = Column(String(50), nullable=False, unique=True, index=True)
+    description = Column(Text)
+    
+    category_id = Column(Integer, ForeignKey("catalog_categories.id"), nullable=False)
+    sample_type_id = Column(Integer, ForeignKey("catalog_sample_types.id"), nullable=False)
+    
+    price = Column(Numeric(10, 2), nullable=False)
+    cost = Column(Numeric(10, 2))
+    
+    turnaround_time = Column(String(100)) # e.g., "24-48 hours"
+    is_active = Column(Boolean, default=True, index=True)
+    
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
+    
+    category = relationship("Category", back_populates="tests")
+    sample_type = relationship("SampleType", back_populates="tests")
+
+    # Relationships to other modules (Orders) would go here
+    # order_items = relationship("OrderItem", back_populates="test")

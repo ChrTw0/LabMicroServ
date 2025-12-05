@@ -178,16 +178,33 @@ curl http://localhost:8005/health  # Configuration Service
 4. Laboratorista (resultados de lab)
 
 ### 🔄 En Progreso
-- ⏳ F-02: Gestión de roles y permisos
+- ⏳ (Sprint 2) Gestión de pacientes completa
 
 ### 📋 Pendiente (Sprint 1)
-- ⏸️ F-08: Gestión del catálogo
-- ⏸️ F-09: Visualización y búsqueda de servicios
-- ⏸️ F-10: Gestión económica del catálogo
-- ⏸️ F-11: Creación y gestión de órdenes
-- ⏸️ F-12: Control económico de órdenes
-- ⏸️ F-13: Control administrativo de órdenes
-- ⏸️ F-27: Reportes operativos
+✅ **¡SPRINT 1 COMPLETADO!**
+
+### ✅ Recién Completado (Sprint 1)
+- ✅ F-12: Control económico de órdenes
+  - ✅ Registro de pagos por orden.
+  - ✅ Cálculo de saldo pendiente.
+- ✅ F-13: Control administrativo de órdenes
+  - ✅ Gestión del ciclo de vida de la orden (Pendiente -> En Proceso -> Completada/Cancelada).
+- ✅ F-11: Creación y gestión de órdenes
+  - ✅ Creación de órdenes con múltiples pruebas del catálogo.
+  - ✅ Cálculo automático de totales.
+  - ✅ CRUD básico para órdenes y visualización de sus items.
+- ✅ F-08, F-09, F-10: Módulo de Catálogo de Servicios
+  - ✅ CRUD completo para Categorías, Tipos de Muestra y Pruebas de Laboratorio.
+  - ✅ Gestión de precios y costos.
+  - ✅ Búsqueda y filtrado avanzado de pruebas.
+  - ✅ 15 nuevos endpoints REST documentados en `order-service`.
+- ✅ F-02: Gestión de roles y permisos
+  - ✅ CRUD completo para Usuarios
+  - ✅ CRUD completo para Roles
+  - ✅ Asignación y revocación de roles a usuarios
+  - ✅ 12 nuevos endpoints REST documentados
+- ✅ F-27: Reportes operativos básicos
+  - ✅ Endpoint de resumen de órdenes (total, por estado, ingresos).
 
 ## 📁 Estructura del Proyecto
 
@@ -312,6 +329,31 @@ LabMicroServ/
 - **Catalog:** Catálogo de servicios/exámenes
 - **Orders:** Gestión de órdenes de servicio
 - **Lab Integration:** Sincronización con LIS
+
+**Endpoints disponibles (Catalog):** 15
+- `GET /api/v1/catalog/tests` - Listar/buscar pruebas
+- `POST /api/v1/catalog/tests` - Crear prueba
+- `GET /api/v1/catalog/tests/{test_id}` - Obtener prueba
+- `PUT /api/v1/catalog/tests/{test_id}` - Actualizar prueba
+- `DELETE /api/v1/catalog/tests/{test_id}` - Desactivar prueba
+- `GET /api/v1/catalog/categories` - Listar categorías
+- `POST /api/v1/catalog/categories` - Crear categoría
+- `PUT /api/v1/catalog/categories/{category_id}` - Actualizar categoría
+- `GET /api/v1/catalog/sample-types` - Listar tipos de muestra
+- `POST /api/v1/catalog/sample-types` - Crear tipo de muestra
+- `PUT /api/v1/catalog/sample-types/{sample_type_id}` - Actualizar tipo de muestra
+
+**Endpoints disponibles (Orders):** 5
+- `POST /api/v1/orders` - Crear nueva orden
+- `GET /api/v1/orders` - Listar órdenes
+- `GET /api/v1/orders/{order_id}` - Obtener orden por ID
+- `PUT /api/v1/orders/{order_id}` - Actualizar orden (datos básicos)
+- `DELETE /api/v1/orders/{order_id}` - Cancelar orden
+- `PUT /api/v1/orders/{order_id}/status` - Cambiar estado de la orden
+- `POST /api/v1/orders/{order_id}/payments` - Registrar pago
+
+**Endpoints disponibles (Reports):** 1
+- `GET /api/v1/reports/orders-summary` - Resumen de órdenes
 
 **Base de datos:** `order_db` (9 tablas)
 
@@ -517,14 +559,19 @@ pytest tests/test_auth.py -v
 ## 📝 TODO List
 
 ### Inmediato (Sprint 1)
-- [ ] F-02: Implementar gestión de roles y permisos
-- [ ] F-08: Implementar catálogo de servicios
-- [ ] F-09: Búsqueda y visualización de servicios
-- [ ] F-10: Gestión económica del catálogo
-- [ ] F-11: Creación y gestión de órdenes
-- [ ] F-12: Control económico de órdenes
-- [ ] F-13: Control administrativo de órdenes
-- [ ] F-27: Reportes operativos básicos
+- [x] F-02: Implementar gestión de roles y permisos
+- [x] F-08: Implementar catálogo de servicios
+- [x] F-09: Búsqueda y visualización de servicios
+- [x] F-10: Gestión económica del catálogo
+- [x] F-11: Creación y gestión de órdenes
+- [x] F-12: Control económico de órdenes
+- [x] F-13: Control administrativo de órdenes
+- [x] F-27: Reportes operativos básicos
+### Próximos Pasos (Sprint 2)
+- [ ] F-04: Registro y mantenimiento de pacientes
+- [ ] F-03: Gestión del perfil del usuario
+- [ ] F-31: Parámetros fiscales y técnicos
+- [ ] F-16: Gestión documental de comprobantes
 
 ### Mejoras técnicas
 - [ ] Implementar refresh tokens
@@ -562,3 +609,5 @@ Este proyecto es privado y confidencial.
 
 **Última actualización:** 20 de noviembre de 2025
 **Versión:** 0.1.0 (Sprint 1 - En progreso)
+**Última actualización:** 23 de noviembre de 2025
+**Versión:** 1.0.0 (Sprint 1 - Completado)

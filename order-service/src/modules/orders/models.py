@@ -1,56 +1,63 @@
-"""
-Order Models
-"""
-from sqlalchemy import String, Boolean, Integer, DateTime, Numeric, Text, Enum as SQLEnum, Index, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.sql import func
-from datetime import datetime
-from decimal import Decimal
-from typing import Optional, List
+from sqlalchemy import (Column, Integer, String, Boolean, Numeric, Text,
+                        ForeignKey, DateTime, func, Enum as SQLAlchemyEnum)
+from sqlalchemy.orm import relationship
+from src.core.database import Base
 import enum
 
-from src.core.database import Base
-
-class OrderStatus(str, enum.Enum):
-    REGISTRADA = "REGISTRADA"
-    EN_PROCESO = "EN_PROCESO"
-    COMPLETADA = "COMPLETADA"
-    ANULADA = "ANULADA"
-
-class PaymentMethod(str, enum.Enum):
-    EFECTIVO = "EFECTIVO"
-    TARJETA = "TARJETA"
-    TRANSFERENCIA = "TRANSFERENCIA"
-    YAPE_PLIN = "YAPE_PLIN"
+class OrderStatus(enum.Enum):
+    PENDING = "Pendiente"
+    IN_PROGRESS = "En Proceso"
+    COMPLETED = "Completada"
+    CANCELLED = "Cancelada"
 
 class Order(Base):
     __tablename__ = "orders"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    order_number: Mapped[str] = mapped_column(String(50), unique=True, nullable=False, index=True)
-    patient_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
-    location_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
-    status: Mapped[OrderStatus] = mapped_column(SQLEnum(OrderStatus, native_enum=False), default=OrderStatus.REGISTRADA, index=True)
-    total: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    items: Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
-    payments: Mapped[List["OrderPayment"]] = relationship("OrderPayment", back_populates="order", cascade="all, delete-orphan")
-    # lab_sync_log: Mapped["LabSyncLog"] = relationship("LabSyncLog", back_populates="order", uselist=False)  # Will be added when implementing F-13
+    id = Column(Integer, primary_key=True, index=True)
+    order_code = Column(String(20), unique=True, index=True, nullable=False)
+    
+    patient_id = Column(Integer, nullable=False, index=True) # Foreign key to patient-service (conceptual)
+    referring_doctor_name = Column(String(255))
+    
+    location_id = Column(Integer, nullable=False) # Foreign key to configuration-service (conceptual)
+    
+    total_amount = Column(Numeric(10, 2), nullable=False)
+    discount = Column(Numeric(10, 2), default=0.0)
+    final_amount = Column(Numeric(10, 2), nullable=False)
+    
+    status = Column(SQLAlchemyEnum(OrderStatus), default=OrderStatus.PENDING, nullable=False)
+    
+    created_by_user_id = Column(Integer, nullable=False)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
+
+    items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
+    payments = relationship("OrderPayment", back_populates="order", cascade="all, delete-orphan")
 
 class OrderItem(Base):
     __tablename__ = "order_items"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'), nullable=False, index=True)
-    service_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    service_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    unit_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    quantity: Mapped[int] = mapped_column(Integer, default=1)
-    subtotal: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    order: Mapped["Order"] = relationship("Order", back_populates="items")
+    id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey("orders.id"), nullable=False)
+    
+    test_id = Column(Integer, ForeignKey("catalog_tests.id"), nullable=False)
+    test_name = Column(String(255), nullable=False)
+    test_code = Column(String(50), nullable=False)
+    
+    price = Column(Numeric(10, 2), nullable=False)
+    
+    created_at = Column(DateTime, server_default=func.now())
+
+    order = relationship("Order", back_populates="items")
+    test = relationship("Test", backref="order_items")
 
 class OrderPayment(Base):
     __tablename__ = "order_payments"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'), nullable=False, index=True)
-    payment_method: Mapped[PaymentMethod] = mapped_column(SQLEnum(PaymentMethod, native_enum=False))
-    amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    order: Mapped["Order"] = relationship("Order", back_populates="payments")
+    id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey("orders.id"), nullable=False)
+    
+    amount = Column(Numeric(10, 2), nullable=False)
+    payment_method = Column(String(50), nullable=False) # e.g., 'Efectivo', 'Tarjeta', 'Yape'
+    reference = Column(String(255)) # e.g., transaction ID
+    
+    created_at = Column(DateTime, server_default=func.now())
+    
+    order = relationship("Order", back_populates="payments")
