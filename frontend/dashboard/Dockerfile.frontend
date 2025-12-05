@@ -1,0 +1,47 @@
+# ==============================
+# ETAPA 1: COMPILACIÓN (BUILD)
+# Esta etapa instala dependencias y compila la aplicación React/Expo.
+# ==============================
+FROM node:20-alpine AS builder
+
+# Establece el directorio de trabajo
+WORKDIR /app
+
+# 1. Copia los archivos de definición de dependencias (para optimizar caché)
+# Solo si cambian las dependencias, se reinstalarán.
+COPY package.json .
+
+# 2. Instala las dependencias de Node.js (SE APLICA EL FIX)
+RUN npm install --legacy-peer-deps
+
+# 3. Copia el código fuente completo (incluyendo el código de src/)
+COPY . .
+
+# 4. INSTALA DEPENDENCIAS FALTANTES PARA WEB (EL FIX)
+# Expo requiere que estas dependencias existan para la fase 'expo export:web'
+RUN npm install react-dom@18.2.0 @expo/metro-runtime --legacy-peer-deps
+
+# 5. Compila la aplicación para producción.
+# **FIX AQUÍ:** Reemplazamos 'npm run build' por el comando directo 'expo export'.
+# Usamos 'npx' para asegurar que la versión correcta de Expo CLI sea usada.
+RUN npx expo export --platform web --output-dir build
+
+
+# ==============================
+# ETAPA 2: PRODUCCIÓN (SERVING)
+# Esta etapa solo copia los artefactos compilados a Nginx (la imagen más ligera).
+# ==============================
+FROM nginx:alpine
+
+# 1. Copia los archivos compilados de la etapa 'builder' 
+# NOTA IMPORTANTE: 
+# AJUSTA 'build' si la carpeta de salida de tu compilación de Expo es diferente 
+# (a menudo es 'web-build' o 'dist'). 
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# 2. Configuración de Nginx para manejar el routing de aplicaciones Single Page (SPA)
+# Esto soluciona el problema de "404 not found" al refrescar URLs internas.
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# 3. Puerto de Nginx (el mapeo al puerto 3000 se hace en docker-compose.yml)
+EXPOSE 80
