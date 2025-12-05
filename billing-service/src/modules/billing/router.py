@@ -1,10 +1,11 @@
 """
 Billing Router (API endpoints)
 """
-from fastapi import APIRouter, Depends, status, Query
+from fastapi import APIRouter, Depends, status, Query, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from datetime import date
+import base64
 
 from src.core.database import get_db
 from src.modules.billing.service import InvoiceService
@@ -13,12 +14,13 @@ from src.modules.billing.schemas import (
     InvoiceResponse, InvoiceDetailResponse, InvoiceListResponse, InvoiceStats
 )
 from src.modules.billing.models import InvoiceType, InvoiceStatus
-
-# Note: Authentication will be added later when integrating with user-service
-# For now, endpoints are public for testing
+from src.utils.sunat_client import build_ubl_invoice_xml, sign_xml_placeholder, create_zip_from_xml
 
 router = APIRouter(prefix="/api/v1/invoices", tags=["Invoices"])
 
+# ------------------------------
+# ENDPOINTS EXISTENTES
+# ------------------------------
 
 @router.get(
     "",
@@ -37,18 +39,6 @@ async def get_all_invoices(
     date_to: Optional[date] = Query(None, description="Fecha hasta (YYYY-MM-DD)"),
     db: AsyncSession = Depends(get_db)
 ):
-    """
-    Obtener lista paginada de comprobantes con filtros
-
-    **Filtros disponibles:**
-    - **search**: Busca por número de comprobante, nombre de cliente o documento
-    - **invoice_type**: BOLETA o FACTURA
-    - **invoice_status**: DRAFT, PENDING, SENT, ACCEPTED, REJECTED, CANCELLED
-    - **patient_id**: Filtra por paciente
-    - **location_id**: Filtra por sede
-    - **date_from**: Fecha desde
-    - **date_to**: Fecha hasta
-    """
     return await InvoiceService.get_all_invoices(
         db=db,
         page=page,
@@ -73,14 +63,6 @@ async def get_statistics(
     date_to: Optional[date] = Query(None, description="Fecha hasta (YYYY-MM-DD)"),
     db: AsyncSession = Depends(get_db)
 ):
-    """
-    Obtener estadísticas de facturación
-
-    - Total de comprobantes
-    - Comprobantes por tipo (BOLETA/FACTURA)
-    - Comprobantes por estado
-    - Total facturado (solo comprobantes aceptados)
-    """
     return await InvoiceService.get_statistics(db, date_from, date_to)
 
 
@@ -89,15 +71,7 @@ async def get_statistics(
     response_model=InvoiceDetailResponse,
     summary="Buscar comprobante por orden"
 )
-async def get_invoice_by_order(
-    order_id: int,
-    db: AsyncSession = Depends(get_db)
-):
-    """
-    Buscar comprobante asociado a una orden
-
-    Útil para verificar si una orden ya tiene comprobante generado
-    """
+async def get_invoice_by_order(order_id: int, db: AsyncSession = Depends(get_db)):
     return await InvoiceService.get_invoice_by_order(db, order_id)
 
 
@@ -106,18 +80,7 @@ async def get_invoice_by_order(
     response_model=InvoiceDetailResponse,
     summary="Obtener comprobante por ID"
 )
-async def get_invoice_by_id(
-    invoice_id: int,
-    db: AsyncSession = Depends(get_db)
-):
-    """
-    Obtener detalles completos de un comprobante específico
-
-    Incluye:
-    - Items del comprobante
-    - Datos del cliente
-    - Montos (subtotal, impuestos, total)
-    """
+async def get_invoice_by_id(invoice_id: int, db: AsyncSession = Depends(get_db)):
     return await InvoiceService.get_invoice_by_id(db, invoice_id)
 
 
@@ -127,27 +90,7 @@ async def get_invoice_by_id(
     status_code=status.HTTP_201_CREATED,
     summary="Generar comprobante desde orden"
 )
-async def create_invoice_from_order(
-    data: InvoiceCreate,
-    db: AsyncSession = Depends(get_db)
-):
-    """
-    Generar un comprobante (Boleta o Factura) a partir de una orden
-
-    **Proceso:**
-    1. Valida que la orden exista
-    2. Valida que no exista ya un comprobante para esa orden
-    3. Obtiene datos del paciente
-    4. Valida el tipo de comprobante según documento del cliente:
-       - BOLETA: Para DNI
-       - FACTURA: Solo para RUC
-    5. Genera número correlativo automático (B001-00000001 o F001-00000001)
-    6. Crea el comprobante con los items de la orden
-
-    **Campos:**
-    - **order_id**: ID de la orden (debe estar completada)
-    - **invoice_type**: BOLETA o FACTURA
-    """
+async def create_invoice_from_order(data: InvoiceCreate, db: AsyncSession = Depends(get_db)):
     return await InvoiceService.create_invoice_from_order(db, data)
 
 
@@ -156,24 +99,7 @@ async def create_invoice_from_order(
     response_model=InvoiceResponse,
     summary="Actualizar estado de comprobante"
 )
-async def update_invoice_status(
-    invoice_id: int,
-    data: InvoiceUpdateStatus,
-    db: AsyncSession = Depends(get_db)
-):
-    """
-    Actualizar estado de un comprobante
-
-    **Estados disponibles:**
-    - DRAFT: Borrador
-    - PENDING: Pendiente de envío
-    - SENT: Enviado a SUNAT
-    - ACCEPTED: Aceptado por SUNAT
-    - REJECTED: Rechazado por SUNAT
-    - CANCELLED: Anulado
-
-    **Restricción:** No se puede cambiar el estado de un comprobante anulado
-    """
+async def update_invoice_status(invoice_id: int, data: InvoiceUpdateStatus, db: AsyncSession = Depends(get_db)):
     return await InvoiceService.update_invoice_status(db, invoice_id, data)
 
 
@@ -182,16 +108,43 @@ async def update_invoice_status(
     response_model=InvoiceResponse,
     summary="Anular comprobante"
 )
-async def cancel_invoice(
-    invoice_id: int,
-    db: AsyncSession = Depends(get_db)
-):
-    """
-    Anular un comprobante
-
-    **Nota:**
-    - Cambia el estado a CANCELLED
-    - No se elimina físicamente el comprobante
-    - Un comprobante anulado no puede cambiar de estado
-    """
+async def cancel_invoice(invoice_id: int, db: AsyncSession = Depends(get_db)):
     return await InvoiceService.cancel_invoice(db, invoice_id)
+
+# ------------------------------
+# NUEVOS ENDPOINTS TRIBUTARIOS
+# ------------------------------
+
+@router.get("/{invoice_id}/ubl", summary="Obtener XML UBL generado")
+async def get_invoice_ubl(invoice_id: int, db: AsyncSession = Depends(get_db)):
+    invoice = await InvoiceService.get_invoice_by_id(db, invoice_id)
+    xml = build_ubl_invoice_xml(invoice)
+    return {"invoice_id": invoice_id, "xml": xml}
+
+
+@router.get("/{invoice_id}/cdr", summary="Obtener CDR devuelto por SUNAT")
+async def get_invoice_cdr(invoice_id: int, db: AsyncSession = Depends(get_db)):
+    invoice = await InvoiceService.get_invoice_by_id(db, invoice_id)
+    cdr_bytes = b""  # placeholder si aún no se persiste CDR real
+    cdr_b64 = base64.b64encode(cdr_bytes).decode("utf-8")
+    return {"invoice_id": invoice_id, "cdr": cdr_b64}
+
+
+@router.get("/{invoice_id}/tributary-status", summary="Obtener estado tributario completo")
+async def get_tributary_status(invoice_id: int, db: AsyncSession = Depends(get_db)):
+    invoice = await InvoiceService.get_invoice_by_id(db, invoice_id)
+    return {
+        "invoice_id": invoice.id,
+        "invoice_number": invoice.invoice_number,
+        "status": invoice.invoice_status
+    }
+
+
+@router.post("/{invoice_id}/resend", summary="Reenviar comprobante a SUNAT")
+async def resend_invoice(invoice_id: int, db: AsyncSession = Depends(get_db)):
+    result = await InvoiceService.generate_and_send_to_sunat(db, invoice_id)
+    return {
+        "invoice_id": invoice_id,
+        "invoice_number": result.invoice_number,
+        "status": result.invoice_status
+    }

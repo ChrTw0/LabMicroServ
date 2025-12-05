@@ -26,15 +26,14 @@ class InvoiceStatus(str, enum.Enum):
 class Invoice(Base):
     __tablename__ = "invoices"
     __table_args__ = (
-        Index('ix_invoices_issue_date', 'issue_date'),
-        Index('ix_invoices_order_id', 'order_id'),
+        Index('ix_invoices_issue_date', 'issue_date'),  # índice explícito solo para issue_date
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     invoice_number: Mapped[str] = mapped_column(String(20), unique=True, nullable=False, index=True)
 
     # Referencias lógicas a otros servicios
-    order_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    order_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)  # mantiene index=True
     patient_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     location_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
 
