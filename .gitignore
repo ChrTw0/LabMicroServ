@@ -239,24 +239,3 @@ rabbitmq-data/
 .fleet/
 .idea/workspace.xml
 .idea/tasks.xml
-
-
-# =======================================================
-# 5. ARTEFACTOS DE FRONTEND (REACT NATIVE / EXPO)
-# =======================================================
-# Archivos de caché del Metro Bundler
-.expo/
-.expo-shared/
-
-# Carpetas de compilación web
-/web-build
-/dist
-/build 
-
-# Artefactos nativos (se generan al hacer 'expo prebuild')
-/android
-/ios
-
-# Archivos de depuración y logs de npm
-npm-debug.log*
-yarn-error.log*
