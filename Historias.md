@@ -4,7 +4,7 @@ Como
 Quiero
 Para
 Criterios de aceptación
-RF-001
+✅ RF-001
 Paciente
 Iniciar sesión mediante usuario y contraseña.
 Acceder de forma segura al sistema.
@@ -15,7 +15,7 @@ Acceder de forma segura al sistema.
 
 
 
-RF-002
+✅ RF-002
 Administrador General
 Gestionar los roles de los usuarios (Administrador, Recepcionista, Supervisor, Laboratorista).
 Controlar los permisos y accesos dentro del sistema.
@@ -47,7 +47,7 @@ Restablecer el acceso en caso de olvido o pérdida de contraseña.
 
 
 
-RF-005
+✅ RF-005
 Administrador General
 Crear, modificar y desactivar usuarios del sistema.
 Mantener actualizada la base de usuarios.
@@ -86,7 +86,7 @@ Como
 Quiero
 Para
 Criterios de aceptación
-RF-008
+✅ RF-008
 Administrador General, Recepcionista
 Registrar nuevos pacientes con DNI/RUC, nombres, teléfono, email y dirección.
 Mantener actualizada la base de datos de pacientes.
@@ -97,17 +97,17 @@ Mantener actualizada la base de datos de pacientes.
 
 
 
-RF-009
+✅ RF-009
 Supervisor de Sede, Recepcionista
 Buscar pacientes por DNI, RUC, nombres o apellidos.
 Localizar rápidamente la información de un paciente.
 - Se dispone de un campo de búsqueda con coincidencias parciales.
-- Los resultados se muestran en tiempo real o tras presionar “Buscar”.
+- Los resultados se muestran en tiempo real o tras presionar "Buscar".
 - Se puede ordenar y filtrar por tipo de documento o nombre.
 
 
 
-RF-010
+✅ RF-010
 Administrador General, Recepcionista
 Actualizar la información de pacientes existentes.
 Corregir o completar datos registrados.
@@ -118,7 +118,7 @@ Corregir o completar datos registrados.
 
 
 
-RF-011
+✅ RF-011
 Paciente
 Validar el formato correcto de DNI (8 dígitos) y RUC (11 dígitos).
 Evitar errores en la identificación de pacientes.
@@ -128,7 +128,7 @@ Evitar errores en la identificación de pacientes.
 
 
 
-RF-012
+✅ RF-012
 Recepcionista, Laboratorista, Supervisor de Sede
 Consultar el historial de órdenes anteriores del paciente.
 Conocer el registro de exámenes y resultados previos.
@@ -138,7 +138,7 @@ Conocer el registro de exámenes y resultados previos.
 
 
 
-RF-013
+✅ RF-013
 Paciente
 Validar que DNI/RUC, nombres y apellidos sean obligatorios en el registro.
 Garantizar la integridad mínima de los datos del paciente.
@@ -162,10 +162,11 @@ RF-015
 Administrador General, Supervisor de Sede
 Exportar el listado de pacientes a formato Excel.
 Generar reportes o respaldos externos de los registros.
-- Se incluye botón “Exportar a Excel” en la vista de pacientes.
+- Se incluye botón "Exportar a Excel" en la vista de pacientes.
 - El archivo exportado contiene columnas: DNI/RUC, nombres, teléfono, email, dirección, fecha de registro.
 - La exportación respeta los filtros aplicados.
 - Solo usuarios con permisos pueden ejecutar esta acción.
+NOTA: No implementado aún.
 
 
 
@@ -175,7 +176,7 @@ Como
 Quiero
 Para
 Criterios de aceptación
-RF-016
+✅ RF-016
 Administrador General
 Crear, modificar y desactivar servicios o exámenes del catálogo.
 Mantener actualizado el catálogo de servicios disponibles.
@@ -184,20 +185,20 @@ Mantener actualizado el catálogo de servicios disponibles.
 - Los servicios pueden desactivarse sin ser eliminados.
 - Se registra la fecha y el usuario que realiza cada acción.
 - Solo el Administrador General puede realizar estas operaciones.
-RF-017
+✅ RF-017
 Paciente/ Recepcionista
 Visualizar el catálogo de servicios
 Consultar fácilmente los servicios disponibles antes de registrarlos en una orden.
 - Se muestran únicamente los servicios activos en una tabla con código, nombre, categoría y precio.
 - Se permite ordenar los resultados por columnas.
 - La vista se actualiza dinámicamente sin recargar la página.
-RF-018
+✅ RF-018
 Paciente/ Recepcionista
 Buscar servicios rápidamente
 Localizar rápidamente un servicio específico.
 - Los resultados se muestran en tiempo real mientras se escribe.
 - La búsqueda permite coincidencias parciales por código o nombre.
-RF-019
+✅ RF-019
 Administrador General
 Organizar los servicios por categorías (hematología, bioquímica, etc.).
 Facilitar la navegación en el catálogo
@@ -205,7 +206,7 @@ Facilitar la navegación en el catálogo
 - Cada servicio puede asociarse a una categoría.
 - Se muestran los servicios agrupados por categoría en el catálogo.
 - Solo el Administrador General puede crear o modificar categorías.
-RF-020
+✅ RF-020
 Administrador General
 Actualizar los precios de los servicios.
 Mantener actualizada la información económica del catálogo.
@@ -213,7 +214,7 @@ Mantener actualizada la información económica del catálogo.
 - Se registra la fecha, hora y usuario responsable del cambio.
 - Se notifica automáticamente al Supervisor de Sede sobre la actualización.
 - Solo el Administrador General puede modificar precios.
-RF-021
+✅ RF-021
 Supervisor de Sede
 Activar o desactivar servicios sin eliminarlos.
 Controlar la disponibilidad temporal de los servicios.
@@ -221,7 +222,7 @@ Controlar la disponibilidad temporal de los servicios.
 - Los servicios inactivos no se muestran en el catálogo público.
 - Se conserva un historial de los cambios de estado realizados.
 - Solo usuarios con rol de Administrador pueden ejecutar esta acción.
-RF-022
+✅ RF-022
 Administrador General
 Consultar el historial de cambios de precios.
 Mantener trazabilidad de las modificaciones económicas.
@@ -234,48 +235,48 @@ Como
 Quiero
 Para
 Criterios de aceptación
-RF-023
+✅ RF-023
 Recepcionista
 Crear órdenes de servicio
 Registrar solicitudes de análisis de pacientes.
 - Se permite buscar un paciente existente o registrar uno nuevo.
 - El sistema genera automáticamente un número de orden al guardar.
 - Se registra el usuario, fecha y hora de creación.
-RF-024
+✅ RF-024
 Recepcionista
 Agregar múltiples servicios a una orden
 Atender solicitudes que pueden contener varios análisis.
 - Permite seleccionar múltiples servicios desde el catálogo.
 - Se muestran los precios individuales y el subtotal acumulado.
 - Se pueden eliminar servicios antes de guardar la orden.
-RF-025
+✅ RF-025
 Recepcionista
 Calcular automáticamente los montos
 Evitar errores en cálculos manuales.
 - El sistema calcula automáticamente el subtotal, el IGV (18%) y el total.
 - Se muestran los montos antes de confirmar el registro de la orden.
 - Los cálculos se actualizan al aplicar descuentos o modificar servicios.
-RF-026
+✅ RF-026
 Recepcionista
 Registrar método de pago
 Documentar correctamente las transacciones económicas.
 - Se permite seleccionar el método de pago: Efectivo, Tarjeta, Transferencia o Yape/Plin.
 - Se asocia el pago con la fecha, usuario y monto correspondiente.
-RF-027
+✅ RF-027
 Recepcionista
 Asignar números de orden únicos
 Evitar equivocaciones por identificación de cada orden.
 - El sistema genera automáticamente una secuencia de numeración por sede.
 - Se garantiza que no existan números duplicados.
 - El número se muestra al confirmar el guardado de la orden.
-RF-028
+✅ RF-028
 Recepcionista
 Tener un formato estándar para los números de orden
 Estandarizar la identificación de órdenes.
 - El sistema aplica el formato SEDE-AAAA-NNNNNN (ej. LIM01-2025-000123).
 - La numeración se reinicia automáticamente al iniciar un nuevo año.
 - Se valida el formato antes de registrar la orden.
-RF-029
+✅ RF-029
 Supervisor de Sede
 Aplicar descuentos en órdenes
 Ajustar precios según promociones o convenios.
@@ -283,37 +284,37 @@ Ajustar precios según promociones o convenios.
 - Se muestra el monto descontado y el total actualizado.
 - Se registra el usuario, fecha y motivo del descuento.
 - Solo los usuarios autorizados pueden realizar esta acción.
-RF-030
+✅ RF-030
 Recepcionista
 Validar orden antes de guardar
 Evitar el registro de órdenes vacías.
 - El sistema verifica que exista al menos un servicio seleccionado.
 - Se muestra un mensaje de advertencia si no se cumple la condición.
 - No se permite guardar la orden hasta que se seleccione al menos un servicio.
-RF-031
+✅ RF-031
 Recepcionista
 Agregar observaciones a la orden
 Registrar información complementaria del pedido.
 - Se incluye un campo de texto libre para ingresar observaciones.
 - Las notas se guardan junto con la orden.
 - Las observaciones se muestran en el detalle de la orden y en los reportes.
-RF-032
+✅ RF-032
 Recepcionista
 Ver el estado de órdenes
 Controlar el flujo operativo de cada orden.
-- El sistema asigna el estado “Registrada” por defecto al crear la orden.
-- Se permite cambiar el estado a “En Proceso”, “Completada” o “Anulada”.
+- El sistema asigna el estado "Registrada" por defecto al crear la orden.
+- Se permite cambiar el estado a "En Proceso", "Completada" o "Anulada".
 - Se registra la fecha, hora y usuario en cada cambio de estado.
 - El estado actual se muestra visualmente en la interfaz.
-RF-033
+✅ RF-033
 Supervisor de Sede
 Anular órdenes con justificación
 Cancelar órdenes con trazabilidad.
 - Solo usuarios autorizados pueden anular órdenes.
 - Se solicita un motivo obligatorio antes de anular.
 - Se registra la fecha, usuario y justificación del cambio.
-- El sistema actualiza el estado de la orden a “Anulada”.
-RF-034
+- El sistema actualiza el estado de la orden a "Anulada".
+✅ RF-034
 Supervisor de Sede
 Que el sistema muestre un listado de órdenes filtrable por estado, paciente o fecha.
 Administrar fácilmente las órdenes registradas.
@@ -321,7 +322,7 @@ Administrar fácilmente las órdenes registradas.
 - Se permite filtrar los resultados por estado, paciente y rango de fechas.
 - Se pueden ordenar las columnas según preferencia.
 - La información se actualiza sin necesidad de recargar la página.
-RF-035
+✅ RF-035
 Supervisor de Sede
 Que el sistema muestre el detalle completo de una orden seleccionada.
 Revisar toda la información de una orden específica.
@@ -334,7 +335,7 @@ Como
 Quiero
 Para
 Criterios de aceptación
-RF-036
+✅ RF-036
 Administrador General
 Emitir una
 boleta electrónica
@@ -344,7 +345,7 @@ Cumplir con las obligaciones tributarias ante SUNAT y entregar un comprobante v�
 - La boleta incluye número de serie, fecha, monto total e IGV.
 - Se emite únicamente cuando el paciente no proporciona RUC.
 - El comprobante se envía al paciente por email de forma inmediata.
-RF-037
+✅ RF-037
 Administrador General
 Emitir una factura electrónica al registrar una orden para un cliente con RUC (empresa o persona jurídica).
 Garantizar que el cliente pueda usar el comprobante para fines fiscales y contables.
@@ -352,12 +353,12 @@ Garantizar que el cliente pueda usar el comprobante para fines fiscales y contab
 - Valida que el RUC tenga 11 dígitos y esté activo en SUNAT (si aplica)
 .- La factura se genera con los datos fiscales completos y se asocia a la orden.
 - Se emite solo si el cliente es identificado como facturable.
-RF-038
+✅ RF-038
 Administrador General
 Seleccionar automáticamente el tipo de comprobante (boleta o factura) según el tipo de cliente.
 Agilizar el proceso de facturación sin errores manuales.
 - Si el paciente tiene RUC registrado, el sistema propone factura; si solo tiene DNI, propone boleta.- El usuario puede confirmar o ajustar la selección antes de emitir.- No se permite emitir factura sin RUC ni razón social.
-RF-039
+✅ RF-039
 Administrador General
 Ingresar los datos fiscales obligatorios (RUC, razón social, dirección) al emitir una factura.
 Cumplir con los requisitos legales de SUNAT para facturas electrónicas.
@@ -392,17 +393,17 @@ Administrador General
 Anular un comprobante mediante una nota de crédito.
 Corregir errores en comprobantes ya emitidos, cumpliendo con la normativa tributaria.
 - Solo usuarios autorizados pueden generar notas de crédito.- El sistema vincula la nota al comprobante original.- Se registra motivo, fecha, usuario y se notifica al contador.<br>- No se permite eliminar el comprobante original.
-RF-046
+✅ RF-046
 Administrador General
 Consultar comprobantes emitidos por número, fecha o cliente.
 Facilitar la búsqueda y verificación de comprobantes para atención al cliente o auditoría.
 - La búsqueda permite filtrar por número de comprobante, rango de fechas, DNI/RUC o nombre del cliente.- Los resultados muestran tipo, fecha, monto, estado (aceptado/rechazado) y enlace a PDF/XML.- La vista respeta los permisos por rol.
-RF-047
+✅ RF-047
 Administrador General
 Reenviar un comprobante por email al paciente.
 Atender solicitudes de reenvío sin necesidad de volver a emitir.
 - Desde la consulta de comprobantes, se muestra un botón 'Reenviar por email'.- El sistema usa la plantilla HTML configurada.- Adjunta PDF y XML del comprobante original.<br>- Registra el reenvío en el historial.
-RF-048
+✅ RF-048
 Administrador General
 Descargar los archivos PDF y XML de un comprobante emitido.
 Permitir el acceso a los formatos oficiales para impresión, contabilidad o respaldo.
@@ -515,22 +516,24 @@ Laboratorista
 Enviar datos de la orden como paciente, servicios, fecha y sede.
 Procesar correctamente las muestras en el laboratorio.
 El sistema debe enviar los datos completos requeridos por el sistema de laboratorio o API.
-RF-067
+🟡 RF-067 (Parcial)
 Administrador General
 Integrar el sistema vía API REST o exportación de archivo.
 Asegurar compatibilidad con diferentes sistemas de laboratorio.
 La integración debe permitir configuración de endpoint o exportación en formato estándar (JSON/XML/CSV).
+NOTA: Endpoints REST preparados, integración real pendiente. No hay exportación CSV/XML.
 RF-068
 Laboratorista
 Reintentar la sincronización automáticamente si falla.
 Garantizar que no se pierdan datos por fallos temporales.
 El sistema debe ejecutar hasta 3 reintentos automáticos y registrar los resultados.
-RF-069
+NOTA: Solo existe retry manual vía endpoint, no automático.
+✅ RF-069
 Supervisor de Sede
 Consultar el log de sincronizaciones exitosas y fallidas.
 Monitorear la comunicación entre sistemas.
 El log debe mostrar fecha, hora, estado, usuario y detalles del error si existiera.
-RF-070
+✅ RF-070
 Laboratorista
 Forzar la sincronización manual de una orden específica.
 Resolver casos donde la sincronización automática falle.
@@ -629,21 +632,21 @@ Como
 Quiero
 Para
 Criterios de aceptación
-RF-083
+✅ RF-083
 Administrador General
 Gestionar las sedes del laboratorio.
 Mantener actualizada la información de contacto y ubicación.
 - Permite crear, editar y eliminar sedes.
 - Cada sede tiene nombre, dirección, teléfono y código identificador.
 - No permite ingresar duplicados.
-RF-084
+✅ RF-084
 Administrador General
 Configurar el porcentaje de IGV
 Garantizar el cálculo correcto de los montos facturados.
 - El sistema permite definir el porcentaje vigente de IGV.
 - Los cambios se reflejan automáticamente en las órdenes.
 - Solo el administrador puede modificarlo.
-RF-085
+✅ RF-085
 Administrador General
 Registrar los datos de la empresa (RUC, razón social, logo)
 Incluirlos en los comprobantes y reportes.

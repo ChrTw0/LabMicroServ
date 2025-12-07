@@ -32,14 +32,37 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS middleware
+# CORS middleware - DEBE ir ANTES de los routers
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,
 )
+
+# Middleware adicional para manejar OPTIONS requests
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response as StarletteResponse
+
+class OptionsMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        if request.method == "OPTIONS":
+            return StarletteResponse(
+                status_code=200,
+                headers={
+                    "Access-Control-Allow-Origin": request.headers.get("origin", "*"),
+                    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
+                    "Access-Control-Allow-Headers": "*",
+                    "Access-Control-Allow-Credentials": "true",
+                    "Access-Control-Max-Age": "3600",
+                }
+            )
+        return await call_next(request)
+
+app.add_middleware(OptionsMiddleware)
 
 
 @app.on_event("startup")
@@ -83,9 +106,23 @@ async def health_check():
 
 
 # Import and include routers (proxy routes to microservices)
-# from src.routers import users, patients, orders, billing, config
-# app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
-# app.include_router(patients.router, prefix="/api/v1/patients", tags=["Patients"])
-# app.include_router(orders.router, prefix="/api/v1/orders", tags=["Orders"])
-# app.include_router(billing.router, prefix="/api/v1/billing", tags=["Billing"])
-# app.include_router(config.router, prefix="/api/v1/config", tags=["Configuration"])
+from src.routers import auth, users, roles, patients, orders, billing, config
+
+# User service routers
+app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(roles.router)
+
+# Patient service router
+app.include_router(patients.router)
+
+# Order service routers (includes catalog, orders, and lab-sync)
+app.include_router(orders.router)
+
+# Billing service router
+app.include_router(billing.router)
+
+# Configuration service routers (includes locations, company, settings)
+app.include_router(config.router)
+
+logger.info("✅ All routers registered successfully")
