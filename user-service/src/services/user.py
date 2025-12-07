@@ -9,9 +9,10 @@ from src.repositories.user import UserRepository
 from src.repositories.role import RoleRepository
 from src.schemas.user import (
     UserCreate, UserUpdate, UserResponse, UserDetailResponse,
-    UserListResponse, AssignRolesRequest, UpdateUserPasswordRequest
+    UserListResponse, AssignRolesRequest, UpdateUserPasswordRequest,
+    ProfileUpdateRequest, ChangePasswordRequest, ProfileResponse
 )
-from src.core.security import hash_password
+from src.core.security import hash_password, verify_password
 
 
 class UserService:
@@ -272,6 +273,125 @@ class UserService:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Usuario con ID {user_id} no encontrado"
+            )
+
+        # Hash new password
+        new_password_hash = hash_password(data.new_password)
+
+        # Update password
+        await UserRepository.update_password(db, user_id, new_password_hash)
+
+        return {"message": "Contraseña actualizada exitosamente"}
+
+    # ========== Profile Management Methods (F-03) ==========
+
+    @staticmethod
+    async def get_my_profile(db: AsyncSession, user_id: int) -> ProfileResponse:
+        """Get current user's profile"""
+        user = await UserRepository.get_by_id(db, user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado"
+            )
+
+        role_names = [ur.role.name for ur in user.user_roles if ur.role.is_active]
+
+        return ProfileResponse(
+            id=user.id,
+            email=user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            phone=user.phone,
+            location_id=user.location_id,
+            is_active=user.is_active,
+            roles=role_names,
+            created_at=user.created_at,
+            updated_at=user.updated_at
+        )
+
+    @staticmethod
+    async def update_my_profile(
+        db: AsyncSession,
+        user_id: int,
+        data: ProfileUpdateRequest
+    ) -> ProfileResponse:
+        """Update current user's profile"""
+        # Check if user exists
+        user = await UserRepository.get_by_id(db, user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado"
+            )
+
+        # If email is being changed, check if it's already in use
+        if data.email and data.email != user.email:
+            existing_user = await UserRepository.get_by_email(db, data.email)
+            if existing_user:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"El email '{data.email}' ya está en uso"
+                )
+
+        # Update only provided fields
+        update_data = UserUpdate(
+            first_name=data.first_name,
+            last_name=data.last_name,
+            phone=data.phone
+        )
+
+        # Update user
+        updated_user = await UserRepository.update(db, user_id, update_data, user_id)
+
+        # If email changed, update it separately
+        if data.email and data.email != user.email:
+            from sqlalchemy import update as sql_update
+            from src.models.user import User
+            await db.execute(
+                sql_update(User)
+                .where(User.id == user_id)
+                .values(email=data.email)
+            )
+            await db.commit()
+
+        # Get updated user with roles
+        user = await UserRepository.get_by_id(db, user_id)
+        role_names = [ur.role.name for ur in user.user_roles if ur.role.is_active]
+
+        return ProfileResponse(
+            id=user.id,
+            email=user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            phone=user.phone,
+            location_id=user.location_id,
+            is_active=user.is_active,
+            roles=role_names,
+            created_at=user.created_at,
+            updated_at=user.updated_at
+        )
+
+    @staticmethod
+    async def change_my_password(
+        db: AsyncSession,
+        user_id: int,
+        data: ChangePasswordRequest
+    ) -> dict:
+        """Change current user's password"""
+        # Get user
+        user = await UserRepository.get_by_id(db, user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado"
+            )
+
+        # Verify current password
+        if not verify_password(data.current_password, user.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La contraseña actual es incorrecta"
             )
 
         # Hash new password

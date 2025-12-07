@@ -86,3 +86,47 @@ class UpdateUserPasswordRequest(BaseModel):
         if not any(char.isupper() for char in v):
             raise ValueError('La contraseña debe contener al menos una letra mayúscula')
         return v
+
+
+# ========== Profile Management Schemas (F-03) ==========
+
+class ProfileUpdateRequest(BaseModel):
+    """Schema for user updating their own profile"""
+    first_name: Optional[str] = Field(None, min_length=1, max_length=100, description="Nombre")
+    last_name: Optional[str] = Field(None, min_length=1, max_length=100, description="Apellido")
+    phone: Optional[str] = Field(None, max_length=20, description="Teléfono")
+    email: Optional[EmailStr] = Field(None, description="Email")
+
+
+class ChangePasswordRequest(BaseModel):
+    """Schema for user changing their own password"""
+    current_password: str = Field(..., description="Contraseña actual")
+    new_password: str = Field(..., min_length=8, description="Nueva contraseña")
+
+    @validator('new_password')
+    def validate_password_strength(cls, v):
+        """Validate password meets security requirements"""
+        if len(v) < 8:
+            raise ValueError('La contraseña debe tener al menos 8 caracteres')
+        if not any(char.isdigit() for char in v):
+            raise ValueError('La contraseña debe contener al menos un número')
+        if not any(char.isupper() for char in v):
+            raise ValueError('La contraseña debe contener al menos una letra mayúscula')
+        return v
+
+
+class ProfileResponse(BaseModel):
+    """Schema for profile response"""
+    id: int
+    email: EmailStr
+    first_name: str
+    last_name: str
+    phone: Optional[str] = None
+    location_id: Optional[int] = None
+    is_active: bool
+    roles: List[str] = Field(default_factory=list, description="Nombres de roles asignados")
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True

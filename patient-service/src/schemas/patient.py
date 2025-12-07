@@ -70,10 +70,13 @@ class PatientCreate(PatientBase):
 
 
 class PatientUpdate(BaseModel):
-    """Schema for updating a patient"""
-    phone: Optional[str] = Field(None, max_length=20)
-    email: Optional[str] = Field(None, max_length=255)
-    address: Optional[str] = Field(None, max_length=255)
+    """Schema for updating a patient (RF-010)"""
+    # Contacto (solo datos actualizables)
+    phone: Optional[str] = Field(None, max_length=20, description="Teléfono")
+    email: Optional[str] = Field(None, max_length=255, description="Email")
+    address: Optional[str] = Field(None, max_length=255, description="Dirección")
+
+    # Estado
     is_active: Optional[bool] = None
 
 

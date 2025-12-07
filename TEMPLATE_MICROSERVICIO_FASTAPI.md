@@ -33,9 +33,13 @@ nombre-servicio/
 │   │   ├── requests.py            # DTOs de entrada
 │   │   └── responses.py           # DTOs de salida
 │   │
-│   ├── services/                  # Lógica de negocio
+│   ├── repositories/              # Data access layer (CRUD operations)
 │   │   ├── __init__.py
-│   │   ├── entidad_service.py
+│   │   └── entidad.py             # Solo operaciones de BD
+│   │
+│   ├── services/                  # Business logic layer
+│   │   ├── __init__.py
+│   │   ├── entidad_service.py     # Validaciones y orquestación
 │   │   └── http_client.py         # Cliente HTTP para otros servicios
 │   │
 │   ├── routers/                   # Endpoints REST
