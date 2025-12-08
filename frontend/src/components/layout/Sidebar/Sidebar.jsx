@@ -7,7 +7,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import './Sidebar.css';
 
 const Sidebar = () => {
-  const { user, hasAnyPermission } = useAuth(); // Obtenemos también el usuario para ver sus permisos
+  const { /* user, */ hasAnyPermission } = useAuth(); // Obtenemos también el usuario para ver sus permisos
 
   const menuItems = [
     {
@@ -17,19 +17,19 @@ const Sidebar = () => {
       permissions: null, // Todos los usuarios
     },
     {
-      path: '/patients',
+      path: '/dashboard/patients',
       icon: '👥',
       label: 'Pacientes',
       permissions: ["patients:read"],
     },
     {
-      path: '/orders',
+      path: '/dashboard/orders',
       icon: '📋',
       label: 'Órdenes',
       permissions: ['orders:read'],
     },
     {
-      path: '/billing',
+      path: '/dashboard/billing',
       icon: '💰',
       label: 'Facturación',
       permissions: ['billing:read'],
@@ -41,13 +41,13 @@ const Sidebar = () => {
       <nav className="sidebar-nav">
         {menuItems.map((item) => {
           // --- INICIO: Bloque de depuración ---
-          if (item.permissions) {
+/*           if (item.permissions) {
             const userHasAccess = hasAnyPermission(item.permissions);
             console.log(`[Sidebar] Verificando acceso para: "${item.label}"`);
             console.log(`  - Permisos requeridos:`, item.permissions);
             console.log(`  - Permisos del usuario:`, user);
             console.log(`  - ¿Tiene acceso?: ${userHasAccess}`);
-          }
+          } */
           // --- FIN: Bloque de depuración ---
 
           // Si el item requiere permisos específicos, verificar
