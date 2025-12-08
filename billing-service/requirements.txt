@@ -28,6 +28,9 @@ xmltodict==0.13.0
 lxml==4.9.3
 qrcode==7.4.2
 Pillow==10.1.0
+signxml==3.2.2  # Para firma digital XML
+pyOpenSSL==24.0.0  # Requerido por signxml
+cryptography==41.0.7  # Requerido por signxml
 
 # PDF Generation
 reportlab==4.0.7

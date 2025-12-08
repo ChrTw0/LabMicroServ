@@ -35,9 +35,16 @@ from src.modules.billing.schemas import (
 
 from src.core.config import settings
 from src.utils.sunat_client import SunatClient
+from src.modules.sunat_integration.xml_generator import UBLXMLGenerator
+from src.modules.sunat_integration.sunat_client import SUNATClient
 
 logger = logging.getLogger(__name__)
 sunat_client = SunatClient()
+
+# Nuevos clientes SUNAT
+xml_generator = UBLXMLGenerator()
+# Por defecto usamos ambiente Beta (pruebas)
+sunat_ws_client = SUNATClient.create_beta_client()
 
 
 # ========================================
@@ -46,57 +53,201 @@ sunat_client = SunatClient()
 
 def build_ubl_invoice_xml(invoice: Invoice) -> str:
     """
-    Construye XML UBL simplificado (versión corregida).
-    En producción: implementar UBL 2.1 completo con todas las validaciones SUNAT.
+    Construye XML UBL 2.1 completo usando el nuevo generador.
     """
-    issue_date = invoice.issue_date.strftime("%Y-%m-%d") if isinstance(invoice.issue_date, datetime) else str(invoice.issue_date)
-    
-    lines = [
-        '<?xml version="1.0" encoding="utf-8"?>',
-        '<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"',
-        '         xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"',
-        '         xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">',
-        f'  <cbc:ID>{invoice.invoice_number}</cbc:ID>',
-        f'  <cbc:IssueDate>{issue_date}</cbc:IssueDate>',
-        '  <cac:LegalMonetaryTotal>',
-        f'    <cbc:PayableAmount currencyID="PEN">{invoice.total:.2f}</cbc:PayableAmount>',
-        '  </cac:LegalMonetaryTotal>',
-        '  <cac:AccountingSupplierParty>',
-        f'    <cbc:CustomerAssignedAccountID>{settings.sunat_company_ruc}</cbc:CustomerAssignedAccountID>',
-        '    <cbc:AdditionalAccountID>6</cbc:AdditionalAccountID>',
-        '  </cac:AccountingSupplierParty>',
-        '  <cac:AccountingCustomerParty>',
-        f'    <cbc:CustomerAssignedAccountID>{invoice.customer_document_number}</cbc:CustomerAssignedAccountID>',
-        f'    <cbc:AdditionalAccountID>{"1" if invoice.customer_document_type=="DNI" else "6"}</cbc:AdditionalAccountID>',
-        '  </cac:AccountingCustomerParty>'
-    ]
-    
-    # FIX: Generar InvoiceLines correctamente sin tag padre duplicado
-    for i, item in enumerate(invoice.items, start=1):
-        lines += [
-            '  <cac:InvoiceLine>',
-            f'    <cbc:ID>{i}</cbc:ID>',
-            f'    <cbc:InvoicedQuantity>{item.quantity}</cbc:InvoicedQuantity>',
-            f'    <cbc:LineExtensionAmount currencyID="PEN">{item.subtotal:.2f}</cbc:LineExtensionAmount>',
-            '    <cac:Item>',
-            f'      <cbc:Description>{item.service_name}</cbc:Description>',
-            '    </cac:Item>',
-            '    <cac:Price>',
-            f'      <cbc:PriceAmount currencyID="PEN">{item.unit_price:.2f}</cbc:PriceAmount>',
-            '    </cac:Price>',
-            '  </cac:InvoiceLine>'
-        ]
-    
-    lines.append('</Invoice>')
-    return "\n".join(lines)
+    # Mapeo de tipo de comprobante a código SUNAT
+    tipo_comprobante_map = {
+        InvoiceType.FACTURA: "01",
+        InvoiceType.BOLETA: "03"
+    }
+
+    # Preparar datos del comprobante
+    invoice_data = {
+        "tipo_comprobante": tipo_comprobante_map.get(invoice.invoice_type, "01"),
+        "serie": invoice.invoice_number.split("-")[0],
+        "numero": int(invoice.invoice_number.split("-")[1]),
+        "fecha_emision": invoice.issue_date,
+        "moneda": "PEN",
+        "subtotal": invoice.subtotal,
+        "igv": invoice.tax,
+        "total": invoice.total,
+    }
+
+    # Datos de la empresa emisora
+    company_data = {
+        "ruc": settings.sunat_company_ruc,
+        "razon_social": getattr(settings, "company_name", "MI EMPRESA SAC"),
+        "nombre_comercial": getattr(settings, "company_trade_name", "MI EMPRESA"),
+        "direccion": getattr(settings, "company_address", "Av. Principal 123"),
+        "ciudad": "LIMA",
+        "departamento": "LIMA",
+        "distrito": "LIMA",
+    }
+
+    # Datos del cliente
+    tipo_doc_map = {
+        "DNI": "1",
+        "RUC": "6",
+        "CE": "4",
+        "PASAPORTE": "7"
+    }
+
+    client_data = {
+        "tipo_documento": tipo_doc_map.get(invoice.customer_document_type, "6"),
+        "numero_documento": invoice.customer_document_number,
+        "razon_social": invoice.customer_name if invoice.invoice_type == InvoiceType.FACTURA else None,
+        "nombres_completos": invoice.customer_name if invoice.invoice_type == InvoiceType.BOLETA else None,
+    }
+
+    # Items del comprobante
+    items = []
+    total_base_imponible = Decimal("0.00")
+    total_igv = Decimal("0.00")
+
+    for item in invoice.items:
+        # Para SUNAT, siempre calcular valores base e IGV
+        # Los precios en la BD ya incluyen IGV (precio de venta)
+        precio_incluye_igv = item.unit_price
+        valor_unitario = precio_incluye_igv / Decimal("1.18")  # Base imponible
+        igv_unitario = precio_incluye_igv - valor_unitario  # IGV por unidad
+        igv_total_item = igv_unitario * item.quantity
+        base_total_item = valor_unitario * item.quantity
+
+        # Acumular totales
+        total_base_imponible += base_total_item
+        total_igv += igv_total_item
+
+        items.append({
+            "codigo": item.service_code or f"SERV{item.id}",
+            "descripcion": item.service_name,
+            "cantidad": float(item.quantity),
+            "unidad_medida": "NIU",  # Unidad
+            "valor_unitario": float(valor_unitario),  # Base sin IGV
+            "precio_unitario": float(precio_incluye_igv),  # Precio con IGV
+            "subtotal": float(base_total_item),  # Base total
+            "igv": float(igv_total_item),  # IGV del item
+            "total": float(item.subtotal),  # Total con IGV
+        })
+
+    # Recalcular totales del comprobante basándose en los items calculados
+    invoice_data["subtotal"] = total_base_imponible
+    invoice_data["igv"] = total_igv
+    # total permanece igual (es el total con IGV de la BD)
+
+    # Generar XML usando el nuevo generador
+    xml_content = xml_generator.generate_invoice(
+        invoice_data=invoice_data,
+        company_data=company_data,
+        client_data=client_data,
+        items=items
+    )
+
+    return xml_content
 
 
 def sign_xml_placeholder(xml_str: str) -> bytes:
     """
-    Placeholder para firma digital.
-    TODO: Implementar firma XAdES-BES con certificado .pfx/.pem en producción.
+    Firma XML usando certificado autofirmado para pruebas en SUNAT Beta.
+    Para producción: usar certificado .pfx/.pem real de SUNAT.
     """
-    return xml_str.encode("utf-8")
+    from lxml import etree
+    from signxml import XMLSigner
+    from cryptography.hazmat.primitives import hashes, serialization
+    from cryptography.hazmat.primitives.asymmetric import rsa
+    from cryptography import x509
+    from cryptography.x509.oid import NameOID
+    import datetime
+
+    try:
+        # Generar clave privada RSA temporal para pruebas
+        private_key = rsa.generate_private_key(
+            public_exponent=65537,
+            key_size=2048,
+        )
+
+        # Generar certificado autofirmado temporal
+        subject = issuer = x509.Name([
+            x509.NameAttribute(NameOID.COUNTRY_NAME, "PE"),
+            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Lima"),
+            x509.NameAttribute(NameOID.LOCALITY_NAME, "Lima"),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, "EMPRESA DE PRUEBA"),
+            x509.NameAttribute(NameOID.COMMON_NAME, "20000000001"),
+        ])
+
+        cert = x509.CertificateBuilder().subject_name(
+            subject
+        ).issuer_name(
+            issuer
+        ).public_key(
+            private_key.public_key()
+        ).serial_number(
+            x509.random_serial_number()
+        ).not_valid_before(
+            datetime.datetime.utcnow()
+        ).not_valid_after(
+            datetime.datetime.utcnow() + datetime.timedelta(days=365)
+        ).sign(private_key, hashes.SHA256())
+
+        # Convertir certificado a PEM
+        cert_pem = cert.public_bytes(serialization.Encoding.PEM)
+        key_pem = private_key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.PKCS8,
+            encryption_algorithm=serialization.NoEncryption()
+        )
+
+        # Parsear XML
+        root = etree.fromstring(xml_str.encode('utf-8'))
+
+        # Buscar UBLExtensions donde va la firma
+        ns = {'ext': 'urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2'}
+        ext_content = root.find('.//ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent', ns)
+
+        if ext_content is None:
+            logger.error("No se encontró ExtensionContent para insertar la firma")
+            return xml_str.encode("utf-8")
+
+        # Firmar usando signxml
+        # signxml agregará la firma al elemento raíz, pero necesitamos moverla a ExtensionContent
+        from signxml import methods
+        signer = XMLSigner(
+            method=methods.enveloped,
+            signature_algorithm="rsa-sha256",
+            digest_algorithm="sha256",
+            c14n_algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
+        )
+
+        # Firmar el documento completo
+        signed_root = signer.sign(
+            root,
+            key=key_pem,
+            cert=cert_pem
+        )
+
+        # Buscar la firma que signxml agregó (usualmente al final del documento)
+        ds_ns = {'ds': 'http://www.w3.org/2000/09/xmldsig#'}
+        signature_elem = signed_root.find('.//ds:Signature', ds_ns)
+
+        if signature_elem is not None:
+            # Mover la firma al ExtensionContent
+            ext_content_new = signed_root.find('.//ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent', ns)
+            if ext_content_new is not None:
+                # Remover la firma de su ubicación actual
+                signature_elem.getparent().remove(signature_elem)
+                # Agregar la firma dentro de ExtensionContent
+                ext_content_new.append(signature_elem)
+                logger.info("✅ XML firmado correctamente con certificado de prueba")
+            else:
+                logger.warning("No se pudo mover la firma a ExtensionContent")
+        else:
+            logger.warning("No se encontró la firma generada por signxml")
+
+        return etree.tostring(signed_root, encoding='utf-8', xml_declaration=True)
+
+    except Exception as e:
+        logger.error(f"Error al firmar XML: {e}")
+        logger.warning("⚠️  Enviando XML SIN FIRMA DIGITAL")
+        return xml_str.encode("utf-8")
 
 
 def create_zip_from_xml(xml_bytes: bytes, filename_without_ext: str) -> bytes:
@@ -370,6 +521,7 @@ class InvoiceService:
         for order_item in order_data.get("items", []):
             item = InvoiceItem(
                 invoice_id=invoice.id,
+                service_code=order_item.get("service_code"),  # Código del servicio
                 service_name=order_item.get("service_name", ""),
                 quantity=order_item.get("quantity", 1),
                 unit_price=Decimal(str(order_item.get("unit_price", "0.00"))),
@@ -472,15 +624,22 @@ class InvoiceService:
         # 3) Firmar XML
         signed_xml_bytes = sign_xml_placeholder(xml)
 
-        # 4) Crear ZIP
-        filename_base = invoice.invoice_number.replace("-", "_")
-        zip_bytes = create_zip_from_xml(signed_xml_bytes, filename_base)
+        # Convertir bytes a string para el cliente SUNAT
+        signed_xml_str = signed_xml_bytes.decode('utf-8')
+
+        # 4) Crear ZIP (ya no es necesario para el nuevo cliente)
+        # El nuevo cliente SUNATClient crea el ZIP internamente
 
         # 5) Enviar a SUNAT
         try:
-            send_result = sunat_client.send_bill(
-                signed_xml=signed_xml_bytes,
-                invoice_filename=filename_base
+            # Usar el nuevo cliente SUNAT con el XML firmado
+            # Formato del filename: RUC-TIPO-SERIE-NUMERO
+            # Ejemplo: 20000000001-03-B001-00000001
+            tipo_doc = "01" if invoice.invoice_type == InvoiceType.FACTURA else "03"
+            xml_filename = f"{settings.sunat_company_ruc}-{tipo_doc}-{invoice.invoice_number}"
+            send_result = await sunat_ws_client.send_bill(
+                xml_content=signed_xml_str,  # XML firmado como string
+                filename=xml_filename
             )
         except Exception as e:
             logger.exception("Error enviando a SUNAT")

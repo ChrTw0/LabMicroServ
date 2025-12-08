@@ -57,8 +57,8 @@ async def create_invoices(session: AsyncSession) -> int:
             "tax": Decimal("0.00"),
             "total": Decimal("40.00"),
             "items": [
-                {"service_name": "Hemograma Completo", "quantity": 1, "unit_price": Decimal("25.00"), "subtotal": Decimal("25.00")},
-                {"service_name": "Examen de Orina Completo", "quantity": 1, "unit_price": Decimal("15.00"), "subtotal": Decimal("15.00")},
+                {"service_code": "HEM001", "service_name": "Hemograma Completo", "quantity": 1, "unit_price": Decimal("25.00"), "subtotal": Decimal("25.00")},
+                {"service_code": "ORI001", "service_name": "Examen de Orina Completo", "quantity": 1, "unit_price": Decimal("15.00"), "subtotal": Decimal("15.00")},
             ],
             "created_days_ago": 5
         },
@@ -77,8 +77,8 @@ async def create_invoices(session: AsyncSession) -> int:
             "tax": Decimal("0.00"),
             "total": Decimal("30.00"),
             "items": [
-                {"service_name": "Grupo Sanguíneo y Factor Rh", "quantity": 1, "unit_price": Decimal("20.00"), "subtotal": Decimal("20.00")},
-                {"service_name": "Glucosa en Ayunas", "quantity": 1, "unit_price": Decimal("10.00"), "subtotal": Decimal("10.00")},
+                {"service_code": "HEM002", "service_name": "Grupo Sanguíneo y Factor Rh", "quantity": 1, "unit_price": Decimal("20.00"), "subtotal": Decimal("20.00")},
+                {"service_code": "BIO001", "service_name": "Glucosa en Ayunas", "quantity": 1, "unit_price": Decimal("10.00"), "subtotal": Decimal("10.00")},
             ],
             "created_days_ago": 3
         },
@@ -97,10 +97,10 @@ async def create_invoices(session: AsyncSession) -> int:
             "tax": Decimal("27.00"),  # 18% IGV
             "total": Decimal("177.00"),
             "items": [
-                {"service_name": "Perfil Hepático", "quantity": 1, "unit_price": Decimal("60.00"), "subtotal": Decimal("60.00")},
-                {"service_name": "Perfil Renal", "quantity": 1, "unit_price": Decimal("55.00"), "subtotal": Decimal("55.00")},
-                {"service_name": "Hemograma Completo", "quantity": 1, "unit_price": Decimal("25.00"), "subtotal": Decimal("25.00")},
-                {"service_name": "Glucosa en Ayunas", "quantity": 1, "unit_price": Decimal("10.00"), "subtotal": Decimal("10.00")},
+                {"service_code": "BIO002", "service_name": "Perfil Hepático", "quantity": 1, "unit_price": Decimal("60.00"), "subtotal": Decimal("60.00")},
+                {"service_code": "BIO003", "service_name": "Perfil Renal", "quantity": 1, "unit_price": Decimal("55.00"), "subtotal": Decimal("55.00")},
+                {"service_code": "HEM001", "service_name": "Hemograma Completo", "quantity": 1, "unit_price": Decimal("25.00"), "subtotal": Decimal("25.00")},
+                {"service_code": "BIO001", "service_name": "Glucosa en Ayunas", "quantity": 1, "unit_price": Decimal("10.00"), "subtotal": Decimal("10.00")},
             ],
             "created_days_ago": 2
         },

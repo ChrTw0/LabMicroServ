@@ -63,6 +63,7 @@ class InvoiceItem(Base):
     __tablename__ = "invoice_items"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     invoice_id: Mapped[int] = mapped_column(ForeignKey('invoices.id'), nullable=False, index=True)
+    service_code: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)  # Código del servicio
     service_name: Mapped[str] = mapped_column(String(255), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     unit_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)

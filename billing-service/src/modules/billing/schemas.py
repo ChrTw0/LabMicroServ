@@ -14,6 +14,7 @@ class InvoiceItemResponse(BaseModel):
     """Schema for invoice item response"""
     id: int
     invoice_id: int
+    service_code: Optional[str] = None
     service_name: str
     quantity: int
     unit_price: Decimal

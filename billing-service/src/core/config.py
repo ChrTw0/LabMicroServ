@@ -55,6 +55,11 @@ class Settings(BaseSettings):
     sunat_cert_path: str = Field(default="", env="SUNAT_CERT_PATH")  # Ruta a certificado .pfx/.pem
     sunat_cert_pass: str = Field(default="", env="SUNAT_CERT_PASS")  # Contraseña del certificado
 
+    # Company data (for invoices)
+    company_name: str = Field(default="MI EMPRESA SAC", env="COMPANY_NAME")
+    company_trade_name: str = Field(default="MI EMPRESA", env="COMPANY_TRADE_NAME")
+    company_address: str = Field(default="Av. Principal 123", env="COMPANY_ADDRESS")
+
     # ----------------------
     # SMTP (correo electrónico)
     # ----------------------
