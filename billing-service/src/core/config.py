@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     # ----------------------
     service_name: str = Field(default="billing-service", env="SERVICE_NAME")
     environment: str = Field(default="development", env="ENVIRONMENT")
-    port: int = Field(default=8005, env="PORT")
+    port: int = Field(default=8004, env="PORT")
 
     # ----------------------
     # Database
@@ -39,10 +39,10 @@ class Settings(BaseSettings):
     # ----------------------
     # External Services URLs
     # ----------------------
-    user_service_url: str = Field(default="http://localhost:8001", env="USER_SERVICE_URL")
-    patient_service_url: str = Field(default="http://localhost:8002", env="PATIENT_SERVICE_URL")
-    order_service_url: str = Field(default="http://localhost:8003", env="ORDER_SERVICE_URL")
-    configuration_service_url: str = Field(default="http://localhost:8005", env="CONFIGURATION_SERVICE_URL")
+    user_service_url: str = Field(default="http://user-service:8001", env="USER_SERVICE_URL")
+    patient_service_url: str = Field(default="http://patient-service:8002", env="PATIENT_SERVICE_URL")
+    order_service_url: str = Field(default="http://order-service:8003", env="ORDER_SERVICE_URL")
+    configuration_service_url: str = Field(default="http://configuration-service:8005", env="CONFIGURATION_SERVICE_URL")
 
     # ----------------------
     # Fiscal / SUNAT
