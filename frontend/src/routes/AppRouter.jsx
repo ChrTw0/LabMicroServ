@@ -16,6 +16,7 @@ import PatientOrdersListPage from '../pages/Orders/PatientOrdersListPage'; // Im
 import OrderFormPage from '../pages/Orders/OrderFormPage';
 import BillingListPage from '../pages/Billing/BillingListPage';
 import NotFoundPage from '../pages/NotFound/NotFoundPage';
+import CatalogoPage from '../pages/Catalogo/CatalogoPage';
 
 // Layout
 import Layout from '../components/layout/Layout/Layout';
@@ -34,6 +35,12 @@ export const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Ruta pública: Catálogo (página de inicio) */}
+        <Route
+          path="/"
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <CatalogoPage />}
+        />
+
         {/* Ruta pública: Login */}
         <Route
           path="/login"
@@ -42,7 +49,7 @@ export const AppRouter = () => {
 
         {/* Rutas protegidas con Layout */}
         <Route
-          path="/"
+          path="/dashboard" // Cambiamos el path base para que no entre en conflicto con la raíz pública
           element={
             <PrivateRoute>
               <Layout />
@@ -50,8 +57,8 @@ export const AppRouter = () => {
           }
         >
           {/* Dashboard */}
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<DashboardPage />} />
+          <Route index element={<DashboardPage />} />
+          {/* <Route path="dashboard" element={<DashboardPage />} /> */}
 
           {/* Pacientes */}
           {/* TODO: Proteger estas rutas con `hasPermission` */}

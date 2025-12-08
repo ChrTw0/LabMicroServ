@@ -198,7 +198,40 @@ curl http://localhost:8005/health  # Configuration Service
 - ⏸️ F-12: Control económico de órdenes
 - ⏸️ F-13: Control administrativo de órdenes
 - ⏸️ F-27: Reportes operativos
+- 
+### 📋 Sprint 2
 
+- ⏸️ F-03:Gestión del perfil de usuario
+- ⏸️ F-04:Registro y mantenimiento de pacientes
+- ⏸️ F-31:Parámetros fiscales y técnicos
+- ⏸️ F-16:Gestión documental de comprobantes
+
+### 📋 Sprint 3
+
+- ⏸️ F-06:Consulta e historial clínico
+- ⏸️ F-23:Gestión de discrepancias
+- ⏸️ F-22:Reportes financieros
+- ⏸️ F-20:Monitoreo y reenvío de notificaciones
+- ⏸️ F-21:Conciliación automática diaria
+- ⏸️ F-24:Sincronización automática
+- ⏸️ F-26:Visualización de KPIs
+- ⏸️ F-19:Alertas operativas
+
+### 📋 Sprint 4
+
+- ⏸️ F-05:Búsqueda y validación de datos
+- ⏸️ F-14:Emisión automática de comprobantes
+- ⏸️ F-17:Notificaciones automáticas al paciente
+- ⏸️ F-25:Gestión técnica de integración
+- ⏸️ F-32:Parámetros locales
+- ⏸️ F-07:Exportación y reportes de pacientes
+- ⏸️ F-28:Análisis de tendencias
+- ⏸️ F-29:Interacción y exportación
+- ⏸️ F-18:Gestión de comunicación institucional
+- ⏸️ F-33:Backup y restauración
+- ⏸️ F-15:Cumplimiento tributario y validación
+
+  
 ## 📁 Estructura del Proyecto
 
 ```
