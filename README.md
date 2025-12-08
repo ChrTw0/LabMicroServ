@@ -108,8 +108,11 @@ docker-compose exec configuration-service alembic upgrade head
 ### 4. Poblar datos iniciales (Seed)
 
 ```bash
-# Crear roles y usuarios iniciales
+# Creación de registros
 docker-compose exec user-service python seed_data.py
+docker-compose exec patient-service python seed_data.py
+docker-compose exec order-service python seed_data.py
+docker-compose exec billing-service python seed_data.py
 ```
 
 ### Credenciales de Usuario por Defecto:
