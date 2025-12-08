@@ -6,18 +6,27 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { PrivateRoute } from './PrivateRoute';
 import { useAuth } from '../hooks/useAuth';
 
-// Pages (las crearemos después)
+// Pages
 import LoginPage from '../pages/Login/LoginPage';
 import DashboardPage from '../pages/Dashboard/DashboardPage';
 import PatientsListPage from '../pages/Patients/PatientsListPage';
 import PatientFormPage from '../pages/Patients/PatientFormPage';
 import OrdersListPage from '../pages/Orders/OrdersListPage';
+import PatientOrdersListPage from '../pages/Orders/PatientOrdersListPage'; // Importar la nueva página
 import OrderFormPage from '../pages/Orders/OrderFormPage';
 import BillingListPage from '../pages/Billing/BillingListPage';
 import NotFoundPage from '../pages/NotFound/NotFoundPage';
 
 // Layout
 import Layout from '../components/layout/Layout/Layout';
+
+// Wrapper para la página de Órdenes
+const OrdersPageWrapper = () => {
+  const { hasRole } = useAuth();
+  // Si el usuario es un paciente, muestra su listado de órdenes.
+  // De lo contrario, muestra la gestión de órdenes para otros roles.
+  return hasRole('Paciente') ? <PatientOrdersListPage /> : <OrdersListPage />;
+};
 
 export const AppRouter = () => {
   const { isAuthenticated } = useAuth();
@@ -45,12 +54,13 @@ export const AppRouter = () => {
           <Route path="dashboard" element={<DashboardPage />} />
 
           {/* Pacientes */}
+          {/* TODO: Proteger estas rutas con `hasPermission` */}
           <Route path="patients" element={<PatientsListPage />} />
           <Route path="patients/new" element={<PatientFormPage />} />
           <Route path="patients/:id/edit" element={<PatientFormPage />} />
 
           {/* Órdenes */}
-          <Route path="orders" element={<OrdersListPage />} />
+          <Route path="orders" element={<OrdersPageWrapper />} />
           <Route path="orders/new" element={<OrderFormPage />} />
           <Route path="orders/:id/edit" element={<OrderFormPage />} />
 

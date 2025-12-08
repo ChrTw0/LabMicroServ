@@ -19,6 +19,7 @@ class UserInfo(BaseModel):
     first_name: str
     last_name: str
     roles: List[str] = Field(default_factory=list, description="Roles del usuario")
+    permissions: List[str] = Field(default_factory=list, description="Permisos del usuario")
     location_id: Optional[int] = None
     is_active: bool
 

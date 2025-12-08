@@ -7,32 +7,32 @@ import { useAuth } from '../../../hooks/useAuth';
 import './Sidebar.css';
 
 const Sidebar = () => {
-  const { hasAnyRole } = useAuth();
+  const { user, hasAnyPermission } = useAuth(); // Obtenemos también el usuario para ver sus permisos
 
   const menuItems = [
     {
       path: '/dashboard',
       icon: '📊',
       label: 'Dashboard',
-      roles: null, // Todos los usuarios
+      permissions: null, // Todos los usuarios
     },
     {
       path: '/patients',
       icon: '👥',
       label: 'Pacientes',
-      roles: ['Administrador General', 'Recepcionista'],
+      permissions: ["patients:read"],
     },
     {
       path: '/orders',
       icon: '📋',
       label: 'Órdenes',
-      roles: ['Administrador General', 'Recepcionista', 'Laboratorista'],
+      permissions: ['orders:read'],
     },
     {
       path: '/billing',
       icon: '💰',
       label: 'Facturación',
-      roles: ['Administrador General', 'Recepcionista', 'Supervisor de Sede'],
+      permissions: ['billing:read'],
     },
   ];
 
@@ -40,8 +40,18 @@ const Sidebar = () => {
     <aside className="sidebar">
       <nav className="sidebar-nav">
         {menuItems.map((item) => {
-          // Si el item requiere roles específicos, verificar
-          if (item.roles && !hasAnyRole(item.roles)) {
+          // --- INICIO: Bloque de depuración ---
+          if (item.permissions) {
+            const userHasAccess = hasAnyPermission(item.permissions);
+            console.log(`[Sidebar] Verificando acceso para: "${item.label}"`);
+            console.log(`  - Permisos requeridos:`, item.permissions);
+            console.log(`  - Permisos del usuario:`, user);
+            console.log(`  - ¿Tiene acceso?: ${userHasAccess}`);
+          }
+          // --- FIN: Bloque de depuración ---
+
+          // Si el item requiere permisos específicos, verificar
+          if (item.permissions && !hasAnyPermission(item.permissions)) {
             return null;
           }
 

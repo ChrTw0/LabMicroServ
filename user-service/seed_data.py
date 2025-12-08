@@ -62,7 +62,7 @@ async def create_roles(session: AsyncSession) -> dict[str, Role]:
         {
             "name": "Paciente",
             "description": "Acceso a resultados de laboratorio, historial de órdenes",
-            "permissions": '["orders:read", "results:read"]'
+            "permissions": '["results:read", "orders:read"]'
         }
     ]
 

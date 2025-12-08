@@ -1,6 +1,7 @@
 """
 Authentication Service (Business logic layer)
 """
+import json
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from typing import Optional, List
@@ -78,14 +79,27 @@ class AuthService:
                 detail="Usuario inactivo. Contacte al administrador."
             )
 
-        # Get user roles
-        role_names = [ur.role.name for ur in user.user_roles if ur.role.is_active]
+        # Get user roles and permissions
+        active_roles = [ur.role for ur in user.user_roles if ur.role.is_active]
+        role_names = [role.name for role in active_roles]
+        
+        permissions = set()
+        for role in active_roles:
+            if role.permissions:
+                try:
+                    perms = json.loads(role.permissions)
+                    if isinstance(perms, list):
+                        permissions.update(perms)
+                except json.JSONDecodeError:
+                    # Log error if permissions format is invalid
+                    pass
 
         # Create JWT token
         token_data = {
             "user_id": user.id,
             "email": user.email,
-            "roles": role_names
+            "roles": role_names,
+            "permissions": list(permissions)
         }
 
         access_token = create_access_token(
@@ -109,6 +123,7 @@ class AuthService:
             first_name=user.first_name,
             last_name=user.last_name,
             roles=role_names,
+            permissions=list(permissions),
             location_id=user.location_id,
             is_active=user.is_active
         )
@@ -187,9 +202,20 @@ class AuthService:
             entity_id=user.id
         )
 
-        # Get user with roles
+        # Get user with roles and permissions
         user = await AuthRepository.get_user_by_id(db, user.id)
-        role_names = [ur.role.name for ur in user.user_roles]
+        active_roles = [ur.role for ur in user.user_roles if ur.role.is_active]
+        role_names = [role.name for role in active_roles]
+        
+        permissions = set()
+        for role in active_roles:
+            if role.permissions:
+                try:
+                    perms = json.loads(role.permissions)
+                    if isinstance(perms, list):
+                        permissions.update(perms)
+                except json.JSONDecodeError:
+                    pass
 
         return UserInfo(
             id=user.id,
@@ -197,6 +223,7 @@ class AuthService:
             first_name=user.first_name,
             last_name=user.last_name,
             roles=role_names,
+            permissions=list(permissions),
             location_id=user.location_id,
             is_active=user.is_active
         )
@@ -357,7 +384,18 @@ class AuthService:
                 detail="Usuario no encontrado"
             )
 
-        role_names = [ur.role.name for ur in user.user_roles if ur.role.is_active]
+        active_roles = [ur.role for ur in user.user_roles if ur.role.is_active]
+        role_names = [role.name for role in active_roles]
+        
+        permissions = set()
+        for role in active_roles:
+            if role.permissions:
+                try:
+                    perms = json.loads(role.permissions)
+                    if isinstance(perms, list):
+                        permissions.update(perms)
+                except json.JSONDecodeError:
+                    pass
 
         return UserInfo(
             id=user.id,
@@ -365,6 +403,7 @@ class AuthService:
             first_name=user.first_name,
             last_name=user.last_name,
             roles=role_names,
+            permissions=list(permissions),
             location_id=user.location_id,
             is_active=user.is_active
         )

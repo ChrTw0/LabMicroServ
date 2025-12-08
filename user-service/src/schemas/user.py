@@ -46,6 +46,7 @@ class UserResponse(UserBase):
     """Schema for user response"""
     id: int
     roles: List[str] = Field(default_factory=list, description="Nombres de roles asignados")
+    permissions: List[str] = Field(default_factory=list, description="Permisos del usuario")
     created_at: datetime
     updated_at: Optional[datetime] = None
 

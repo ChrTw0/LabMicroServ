@@ -1,6 +1,7 @@
 """
 User Service (Business logic layer)
 """
+import json
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from typing import Optional
@@ -49,7 +50,16 @@ class UserService:
         # Convert to response schema
         user_responses = []
         for user in users:
-            role_names = [ur.role.name for ur in user.user_roles if ur.role.is_active]
+            active_roles = [ur.role for ur in user.user_roles if ur.role.is_active]
+            role_names = [role.name for role in active_roles]
+            permissions = set()
+            for role in active_roles:
+                if role.permissions:
+                    try:
+                        permissions.update(json.loads(role.permissions))
+                    except json.JSONDecodeError:
+                        pass
+            
             user_dict = {
                 'id': user.id,
                 'email': user.email,
@@ -59,6 +69,7 @@ class UserService:
                 'location_id': user.location_id,
                 'is_active': user.is_active,
                 'roles': role_names,
+                'permissions': list(permissions),
                 'created_at': user.created_at,
                 'updated_at': user.updated_at
             }
@@ -81,7 +92,15 @@ class UserService:
                 detail=f"Usuario con ID {user_id} no encontrado"
             )
 
-        role_names = [ur.role.name for ur in user.user_roles if ur.role.is_active]
+        active_roles = [ur.role for ur in user.user_roles if ur.role.is_active]
+        role_names = [role.name for role in active_roles]
+        permissions = set()
+        for role in active_roles:
+            if role.permissions:
+                try:
+                    permissions.update(json.loads(role.permissions))
+                except json.JSONDecodeError:
+                    pass
 
         return UserDetailResponse(
             id=user.id,
@@ -92,6 +111,7 @@ class UserService:
             location_id=user.location_id,
             is_active=user.is_active,
             roles=role_names,
+            permissions=list(permissions),
             created_at=user.created_at,
             updated_at=user.updated_at,
             created_by=user.created_by,
@@ -147,7 +167,15 @@ class UserService:
 
         # Get user with roles
         user = await UserRepository.get_by_id(db, user.id)
-        role_names = [ur.role.name for ur in user.user_roles]
+        active_roles = [ur.role for ur in user.user_roles if ur.role.is_active]
+        role_names = [role.name for role in active_roles]
+        permissions = set()
+        for role in active_roles:
+            if role.permissions:
+                try:
+                    permissions.update(json.loads(role.permissions))
+                except json.JSONDecodeError:
+                    pass
 
         return UserResponse(
             id=user.id,
@@ -158,6 +186,7 @@ class UserService:
             location_id=user.location_id,
             is_active=user.is_active,
             roles=role_names,
+            permissions=list(permissions),
             created_at=user.created_at,
             updated_at=user.updated_at
         )
@@ -179,11 +208,19 @@ class UserService:
             )
 
         # Update user
-        user = await UserRepository.update(db, user_id, data, updated_by)
+        await UserRepository.update(db, user_id, data, updated_by)
 
         # Get updated user with roles
         user = await UserRepository.get_by_id(db, user_id)
-        role_names = [ur.role.name for ur in user.user_roles if ur.role.is_active]
+        active_roles = [ur.role for ur in user.user_roles if ur.role.is_active]
+        role_names = [role.name for role in active_roles]
+        permissions = set()
+        for role in active_roles:
+            if role.permissions:
+                try:
+                    permissions.update(json.loads(role.permissions))
+                except json.JSONDecodeError:
+                    pass
 
         return UserResponse(
             id=user.id,
@@ -194,6 +231,7 @@ class UserService:
             location_id=user.location_id,
             is_active=user.is_active,
             roles=role_names,
+            permissions=list(permissions),
             created_at=user.created_at,
             updated_at=user.updated_at
         )
@@ -245,7 +283,15 @@ class UserService:
 
         # Get user with updated roles
         user = await UserRepository.get_by_id(db, user_id)
-        role_names = [ur.role.name for ur in user.user_roles if ur.role.is_active]
+        active_roles = [ur.role for ur in user.user_roles if ur.role.is_active]
+        role_names = [role.name for role in active_roles]
+        permissions = set()
+        for role in active_roles:
+            if role.permissions:
+                try:
+                    permissions.update(json.loads(role.permissions))
+                except json.JSONDecodeError:
+                    pass
 
         return UserResponse(
             id=user.id,
@@ -256,6 +302,7 @@ class UserService:
             location_id=user.location_id,
             is_active=user.is_active,
             roles=role_names,
+            permissions=list(permissions),
             created_at=user.created_at,
             updated_at=user.updated_at
         )
@@ -295,8 +342,16 @@ class UserService:
                 detail="Usuario no encontrado"
             )
 
-        role_names = [ur.role.name for ur in user.user_roles if ur.role.is_active]
-
+        active_roles = [ur.role for ur in user.user_roles if ur.role.is_active]
+        role_names = [role.name for role in active_roles]
+        permissions = set()
+        for role in active_roles:
+            if role.permissions:
+                try:
+                    permissions.update(json.loads(role.permissions))
+                except json.JSONDecodeError:
+                    pass
+        
         return ProfileResponse(
             id=user.id,
             email=user.email,
@@ -306,6 +361,7 @@ class UserService:
             location_id=user.location_id,
             is_active=user.is_active,
             roles=role_names,
+            permissions=list(permissions),
             created_at=user.created_at,
             updated_at=user.updated_at
         )
@@ -342,7 +398,7 @@ class UserService:
         )
 
         # Update user
-        updated_user = await UserRepository.update(db, user_id, update_data, user_id)
+        await UserRepository.update(db, user_id, update_data, user_id)
 
         # If email changed, update it separately
         if data.email and data.email != user.email:
@@ -357,7 +413,15 @@ class UserService:
 
         # Get updated user with roles
         user = await UserRepository.get_by_id(db, user_id)
-        role_names = [ur.role.name for ur in user.user_roles if ur.role.is_active]
+        active_roles = [ur.role for ur in user.user_roles if ur.role.is_active]
+        role_names = [role.name for role in active_roles]
+        permissions = set()
+        for role in active_roles:
+            if role.permissions:
+                try:
+                    permissions.update(json.loads(role.permissions))
+                except json.JSONDecodeError:
+                    pass
 
         return ProfileResponse(
             id=user.id,
@@ -368,6 +432,7 @@ class UserService:
             location_id=user.location_id,
             is_active=user.is_active,
             roles=role_names,
+            permissions=list(permissions),
             created_at=user.created_at,
             updated_at=user.updated_at
         )

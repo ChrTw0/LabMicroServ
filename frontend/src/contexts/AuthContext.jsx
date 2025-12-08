@@ -10,6 +10,7 @@ export const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -23,8 +24,10 @@ export const AuthProvider = ({ children }) => {
         try {
           // Verificar si el token sigue siendo válido
           await authService.verifyToken();
+          const parsedUser = JSON.parse(storedUser);
           setToken(storedToken);
-          setUser(JSON.parse(storedUser));
+          setUser(parsedUser);
+          setPermissions(parsedUser.permissions || []);
           setIsAuthenticated(true);
         } catch (error) {
           // Token inválido, limpiar localStorage
@@ -54,6 +57,7 @@ export const AuthProvider = ({ children }) => {
       // Actualizar estado
       setToken(data.access_token);
       setUser(data.user);
+      setPermissions(data.user.permissions || []);
       setIsAuthenticated(true);
 
       return { success: true, user: data.user };
@@ -74,6 +78,7 @@ export const AuthProvider = ({ children }) => {
     // Limpiar estado
     setToken(null);
     setUser(null);
+    setPermissions([]);
     setIsAuthenticated(false);
   };
 
@@ -84,6 +89,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const userData = await authService.getCurrentUser();
       setUser(userData);
+      setPermissions(userData.permissions || []);
       localStorage.setItem('user', JSON.stringify(userData));
       return { success: true, user: userData };
     } catch (error) {
@@ -108,16 +114,36 @@ export const AuthProvider = ({ children }) => {
     return roleNames.some((roleName) => user.roles.includes(roleName));
   };
 
+  /**
+   * Verificar si el usuario tiene un permiso específico
+   */
+  const hasPermission = (permissionName) => {
+    if (!permissions) return false;
+    return permissions.includes('all') || permissions.includes(permissionName);
+  };
+
+  /**
+   * Verificar si el usuario tiene alguno de los permisos especificados
+   */
+  const hasAnyPermission = (permissionNames) => {
+    if (!permissions) return false;
+    if (permissions.includes('all')) return true;
+    return permissionNames.some((p) => permissions.includes(p));
+  };
+
   const value = {
     user,
     token,
     loading,
     isAuthenticated,
+    permissions,
     login,
     logout,
     updateUser,
     hasRole,
     hasAnyRole,
+    hasPermission,
+    hasAnyPermission,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
