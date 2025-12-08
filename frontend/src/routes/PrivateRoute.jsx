@@ -19,7 +19,7 @@ export const PrivateRoute = ({ children, requiredRoles = null }) => {
 
   // Si no está autenticado, redirigir a login
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   // Si se requieren roles específicos, verificar

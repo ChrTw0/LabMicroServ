@@ -1,11 +1,11 @@
 /**
- * CatalogoPage Component
+ * InicioPage Component
  * Página de Inicio (Landing Page) del Laboratorio Clínico.
  */
 import { useNavigate } from 'react-router-dom';
-import './CatalogoPage.css';
+import './InicioPage.css';
 
-const CatalogoPage = () => {
+const InicioPage = () => {
   const navigate = useNavigate();
 
   const handleRedirect = () => {
@@ -140,4 +140,4 @@ const CatalogoPage = () => {
   );
 };
 
-export default CatalogoPage;
+export default InicioPage;

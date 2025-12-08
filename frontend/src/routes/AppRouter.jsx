@@ -16,7 +16,7 @@ import PatientOrdersListPage from '../pages/Orders/PatientOrdersListPage'; // Im
 import OrderFormPage from '../pages/Orders/OrderFormPage';
 import BillingListPage from '../pages/Billing/BillingListPage';
 import NotFoundPage from '../pages/NotFound/NotFoundPage';
-import CatalogoPage from '../pages/Catalogo/CatalogoPage';
+import InicioPage from '../pages/Inicio/InicioPage';
 
 // Layout
 import Layout from '../components/layout/Layout/Layout';
@@ -38,7 +38,7 @@ export const AppRouter = () => {
         {/* Ruta pública: Catálogo (página de inicio) */}
         <Route
           path="/"
-          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <CatalogoPage />}
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <InicioPage />}
         />
 
         {/* Ruta pública: Login */}
@@ -59,6 +59,10 @@ export const AppRouter = () => {
           {/* Dashboard */}
           <Route index element={<DashboardPage />} />
           {/* <Route path="dashboard" element={<DashboardPage />} /> */}
+
+
+          {/* Catálogo */}
+          {/* <Route path="servicios" element={<CatalogoPage />}/> */}
 
           {/* Pacientes */}
           {/* TODO: Proteger estas rutas con `hasPermission` */}

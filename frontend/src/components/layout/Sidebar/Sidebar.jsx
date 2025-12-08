@@ -17,6 +17,12 @@ const Sidebar = () => {
       permissions: null, // Todos los usuarios
     },
     {
+      path: '/dashboard/servicios',
+      icon: '💉',
+      label: 'Servicios',
+      permissions: null, // Todos los usuarios
+    },
+    {
       path: '/dashboard/patients',
       icon: '👥',
       label: 'Pacientes',
