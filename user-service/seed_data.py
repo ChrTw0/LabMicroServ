@@ -53,6 +53,16 @@ async def create_roles(session: AsyncSession) -> dict[str, Role]:
             "name": "Laboratorista",
             "description": "Gestión de resultados de laboratorio, integración con LIS",
             "permissions": '["orders:read", "lab:read", "lab:write"]'
+        },
+        {
+            "name": "Contador",
+            "description": "Gestión de facturación, reportes contables",
+            "permissions": '["billing:read", "billing:write", "reports:read"]'
+        },
+        {
+            "name": "Paciente",
+            "description": "Acceso a resultados de laboratorio, historial de órdenes",
+            "permissions": '["orders:read", "results:read"]'
         }
     ]
 
@@ -79,6 +89,93 @@ async def create_roles(session: AsyncSession) -> dict[str, Role]:
     await session.commit()
     return created_roles
 
+
+async def create_application_users(session: AsyncSession, roles: dict[str, Role]):
+    """Create application users"""
+    logger.info("Creating application users...")
+
+    users_data = [
+        {
+            "email": "supervisor@labclinico.com",
+            "password": "Supervisor123",
+            "first_name": "Supervisor",
+            "last_name": "Sede",
+            "phone": "+51999999991",
+            "role": "Supervisor de Sede"
+        },
+        {
+            "email": "recepcionista@labclinico.com",
+            "password": "Recepcionista123",
+            "first_name": "Recepcionista",
+            "last_name": "Sede",
+            "phone": "+51999999992",
+            "role": "Recepcionista"
+        },
+        {
+            "email": "laboratorista@labclinico.com",
+            "password": "Laboratorista123",
+            "first_name": "Laboratorista",
+            "last_name": "Sede",
+            "phone": "+51999999993",
+            "role": "Laboratorista"
+        },
+        {
+            "email": "contador@labclinico.com",
+            "password": "Contador123",
+            "first_name": "Contador",
+            "last_name": "Sede",
+            "phone": "+51999999994",
+            "role": "Contador"
+        },
+        {
+            "email": "paciente@labclinico.com",
+            "password": "Paciente123",
+            "first_name": "Paciente",
+            "last_name": "Sede",
+            "phone": "+51999999995",
+            "role": "Paciente"
+        }
+    ]
+
+    for user_data in users_data:
+        # Check if user already exists
+        result = await session.execute(
+            select(User).where(User.email == user_data["email"])
+        )
+        existing_user = result.scalar_one_or_none()
+
+        if existing_user:
+            logger.warning(f"User '{user_data['email']}' already exists, skipping...")
+            continue
+
+        # Create user
+        password_hash = hash_password(user_data["password"])
+
+        user = User(
+            email=user_data["email"],
+            password_hash=password_hash,
+            first_name=user_data["first_name"],
+            last_name=user_data["last_name"],
+            phone=user_data["phone"],
+            is_active=True
+        )
+
+        session.add(user)
+        await session.flush()
+        await session.refresh(user)
+
+        # Assign role
+        role = roles[user_data["role"]]
+        user_role = UserRole(
+            user_id=user.id,
+            role_id=role.id
+        )
+        session.add(user_role)
+
+        logger.success(f"Created user: {user_data['email']} (ID: {user.id})")
+        logger.info(f"  Password: {user_data['password']}")
+
+    await session.commit()
 
 async def create_admin_user(session: AsyncSession, roles: dict[str, Role]) -> User:
     """Create admin user"""
@@ -156,6 +253,9 @@ async def seed_database():
 
             # Create admin user
             admin_user = await create_admin_user(session, roles)
+
+            # Create application users
+            await create_application_users(session, roles)
 
             logger.info("=" * 60)
             logger.success("Database seeding completed successfully!")

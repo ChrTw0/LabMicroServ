@@ -1,12 +1,34 @@
 /**
  * DashboardPage Component
- * Página principal del dashboard
+ * Página principal del dashboard que renderiza el dashboard correspondiente al rol del usuario.
  */
 import { useAuth } from '../../hooks/useAuth';
+import {
+  AdministradorGeneralDashboard,
+  RecepcionistaDashboard,
+  SupervisorSedeDashboard,
+  LaboratoristaDashboard,
+  ContadorDashboard,
+  PacienteDashboard,
+} from '../dashboard';
 import './DashboardPage.css';
+
+const roleDashboards = {
+  'Administrador General': <AdministradorGeneralDashboard />,
+  'Recepcionista': <RecepcionistaDashboard />,
+  'Supervisor de Sede': <SupervisorSedeDashboard />,
+  'Laboratorista': <LaboratoristaDashboard />,
+  'Contador': <ContadorDashboard />,
+  'Paciente': <PacienteDashboard />,
+};
 
 const DashboardPage = () => {
   const { user } = useAuth();
+  
+  // Asumimos que el usuario tiene un solo rol principal
+  const userRole = user?.roles?.[0]; 
+
+  const DashboardComponent = userRole ? roleDashboards[userRole] : null;
 
   return (
     <div className="dashboard-page">
@@ -14,48 +36,7 @@ const DashboardPage = () => {
       <p className="welcome-message">
         Bienvenido, <strong>{user?.first_name} {user?.last_name}</strong>
       </p>
-
-      <div className="dashboard-grid">
-        <div className="dashboard-card">
-          <div className="card-icon">👥</div>
-          <div className="card-content">
-            <h3>Pacientes</h3>
-            <p className="card-number">--</p>
-            <p className="card-description">Total de pacientes registrados</p>
-          </div>
-        </div>
-
-        <div className="dashboard-card">
-          <div className="card-icon">📋</div>
-          <div className="card-content">
-            <h3>Órdenes</h3>
-            <p className="card-number">--</p>
-            <p className="card-description">Órdenes pendientes</p>
-          </div>
-        </div>
-
-        <div className="dashboard-card">
-          <div className="card-icon">💰</div>
-          <div className="card-content">
-            <h3>Facturas</h3>
-            <p className="card-number">--</p>
-            <p className="card-description">Facturas del día</p>
-          </div>
-        </div>
-
-        <div className="dashboard-card">
-          <div className="card-icon">🧪</div>
-          <div className="card-content">
-            <h3>Servicios</h3>
-            <p className="card-number">--</p>
-            <p className="card-description">Servicios disponibles</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="dashboard-info">
-        <p>📌 Las estadísticas se implementarán en la siguiente fase.</p>
-      </div>
+      {DashboardComponent ? DashboardComponent : <div>Rol de usuario no definido o dashboard no encontrado.</div>}
     </div>
   );
 };

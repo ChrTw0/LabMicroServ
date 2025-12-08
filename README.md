@@ -108,15 +108,22 @@ docker-compose exec configuration-service alembic upgrade head
 ### 4. Poblar datos iniciales (Seed)
 
 ```bash
-# Crear roles y usuario administrador
+# Crear roles y usuarios iniciales
 docker-compose exec user-service python seed_data.py
 ```
 
-**Credenciales del administrador:**
-- Email: `admin@labclinico.com`
-- Password: `Admin123`
+### Credenciales de Usuario por Defecto:
 
-⚠️ **IMPORTANTE:** Cambia la contraseña del admin después del primer login.
+⚠️ **IMPORTANTE:** Cambia las contraseñas de todos los usuarios después del primer login, especialmente la del administrador.
+
+| Rol                   | Email                      | Contraseña         |
+| :-------------------- | :------------------------- | :----------------- |
+| Administrador General | `admin@labclinico.com`     | `Admin123`         |
+| Recepcionista         | `recepcionista@labclinico.com` | `Recepcionista123` |
+| Supervisor de Sede    | `supervisor@labclinico.com` | `Supervisor123`    |
+| Laboratorista         | `laboratorista@labclinico.com` | `Laboratorista123` |
+| Contador              | `contador@labclinico.com`  | `Contador123`      |
+| Paciente              | `paciente@labclinico.com`  | `Paciente123`      |
 
 ### 5. Verificar que los servicios estén corriendo
 
