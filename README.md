@@ -198,6 +198,14 @@ curl http://localhost:8005/health  # Configuration Service
 - ⏸️ F-12: Control económico de órdenes
 - ⏸️ F-13: Control administrativo de órdenes
 - ⏸️ F-27: Reportes operativos
+- 
+### 📋 Sprint 2
+
+- ⏸️ F-03:Gestión del perfil de usuario
+- ⏸️ F-04:Registro y mantenimiento de pacientes
+- ⏸️ F-31:Parámetros fiscales y técnicos
+- ⏸️ F-16:Gestión documental de comprobantes
+
 
 ## 📁 Estructura del Proyecto
 
