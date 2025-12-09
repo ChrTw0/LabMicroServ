@@ -440,6 +440,14 @@ class InvoiceService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Ya existe un comprobante para la orden {data.order_id}"
             )
+        existing_invoices = await InvoiceRepository.get_all_by_order_id(db, data.order_id)
+        if existing_invoices:
+            # Permitir crear uno nuevo solo si TODOS los anteriores están anulados
+            if not all(inv.invoice_status == InvoiceStatus.CANCELLED for inv in existing_invoices):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Ya existe un comprobante activo o pendiente para la orden {data.order_id}. Anule el comprobante existente antes de crear uno nuevo."
+                )
 
         # 2) Consultar order-service (corrección aplicada)
         try:

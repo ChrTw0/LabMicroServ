@@ -16,6 +16,7 @@ import PatientOrdersListPage from '../pages/Orders/PatientOrdersListPage'; // Im
 import OrderFormPage from '../pages/Orders/OrderFormPage';
 import OrderDetailPage from '../pages/Orders/OrderDetailPage';
 import CatalogoPage from '../pages/Catalog/CatalogoPage';
+import OrderGenerateInvoicePage from '../pages/Orders/OrderGenerateInvoicePage'; // <-- 1. Importar la nueva página
 import CatalogoFormPage from '../pages/Catalog/CatalogoFormPage';
 import CategoriesPage from '../pages/Catalog/CategoriesPage';
 import PriceHistoryPage from '../pages/Catalog/PriceHistoryPage';
@@ -99,6 +100,7 @@ export const AppRouter = () => {
           <Route path="orders/new" element={<OrderFormPage />} />
           <Route path="orders/:id" element={<OrderDetailPage />} />
           <Route path="orders/:id/edit" element={<OrderFormPage />} />
+          <Route path="orders/:id/generate-invoice" element={<OrderGenerateInvoicePage />} /> {/* <-- 2. Añadir la nueva ruta */}
 
           {/* Facturación */}
           <Route path="billing" element={<BillingListPage />} />

@@ -287,8 +287,9 @@ const OrderDetailPage = () => {
               </button>
             )}
             <button
-              onClick={() => navigate(`/dashboard/invoices/create?order_id=${order.id}`)}
+              onClick={() => navigate(`/dashboard/orders/${order.id}/generate-invoice`)}
               className="btn btn-primary"
+              disabled={!isPaid || order.status !== 'COMPLETADA'}
             >
               Generar Factura/Boleta
             </button>
