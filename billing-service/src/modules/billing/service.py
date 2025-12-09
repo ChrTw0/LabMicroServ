@@ -434,12 +434,6 @@ class InvoiceService:
         - Comunicación corregida con order-service y patient-service usando settings
         """
         # 1) Validar que no exista comprobante para la orden
-        existing = await InvoiceRepository.get_by_order_id(db, data.order_id)
-        if existing:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Ya existe un comprobante para la orden {data.order_id}"
-            )
         existing_invoices = await InvoiceRepository.get_all_by_order_id(db, data.order_id)
         if existing_invoices:
             # Permitir crear uno nuevo solo si TODOS los anteriores están anulados

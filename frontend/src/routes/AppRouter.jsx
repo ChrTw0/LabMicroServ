@@ -99,6 +99,7 @@ export const AppRouter = () => {
           <Route path="orders/new" element={<OrderFormPage />} />
           <Route path="orders/:id" element={<OrderDetailPage />} />
           <Route path="orders/:id/edit" element={<OrderFormPage />} />
+          <Route path="orders/:id/generate-invoice" element={<OrderGenerateInvoicePage />} />
 
           {/* Facturación */}
           <Route path="billing" element={<PrivateRoute requiredPermissions={['billing:read']}><BillingListPage /></PrivateRoute>} />
