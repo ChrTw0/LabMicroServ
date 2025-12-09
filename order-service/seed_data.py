@@ -75,50 +75,50 @@ async def create_services(session: AsyncSession, categories: dict[str, Category]
 
     services_data = [
         # Análisis Clínicos
-        {"name": "Hemograma Completo", "description": "Recuento completo de células sanguíneas", "category": "Análisis Clínicos", "price": "25.00"},
-        {"name": "Examen de Orina Completo", "description": "Análisis físico, químico y microscópico de orina", "category": "Análisis Clínicos", "price": "15.00"},
-        {"name": "Grupo Sanguíneo y Factor Rh", "description": "Determinación de tipo de sangre", "category": "Análisis Clínicos", "price": "20.00"},
+        {"code": "AC001", "name": "Hemograma Completo", "description": "Recuento completo de células sanguíneas", "category": "Análisis Clínicos", "price": "25.00"},
+        {"code": "AC002", "name": "Examen de Orina Completo", "description": "Análisis físico, químico y microscópico de orina", "category": "Análisis Clínicos", "price": "15.00"},
+        {"code": "AC003", "name": "Grupo Sanguíneo y Factor Rh", "description": "Determinación de tipo de sangre", "category": "Análisis Clínicos", "price": "20.00"},
 
         # Hematología
-        {"name": "Recuento de Plaquetas", "description": "Conteo de plaquetas en sangre", "category": "Hematología", "price": "18.00"},
-        {"name": "Tiempo de Coagulación", "description": "Medición del tiempo de coagulación sanguínea", "category": "Hematología", "price": "15.00"},
-        {"name": "Velocidad de Sedimentación Globular (VSG)", "description": "Indicador de inflamación", "category": "Hematología", "price": "12.00"},
+        {"code": "HEM001", "name": "Recuento de Plaquetas", "description": "Conteo de plaquetas en sangre", "category": "Hematología", "price": "18.00"},
+        {"code": "HEM002", "name": "Tiempo de Coagulación", "description": "Medición del tiempo de coagulación sanguínea", "category": "Hematología", "price": "15.00"},
+        {"code": "HEM003", "name": "Velocidad de Sedimentación Globular (VSG)", "description": "Indicador de inflamación", "category": "Hematología", "price": "12.00"},
 
         # Bioquímica
-        {"name": "Glucosa en Ayunas", "description": "Medición de glucosa sanguínea", "category": "Bioquímica", "price": "10.00"},
-        {"name": "Colesterol Total", "description": "Medición de colesterol en sangre", "category": "Bioquímica", "price": "15.00"},
-        {"name": "Triglicéridos", "description": "Medición de triglicéridos en sangre", "category": "Bioquímica", "price": "15.00"},
-        {"name": "Creatinina", "description": "Evaluación de función renal", "category": "Bioquímica", "price": "18.00"},
-        {"name": "Urea", "description": "Evaluación de función renal", "category": "Bioquímica", "price": "16.00"},
-        {"name": "Ácido Úrico", "description": "Detección de gota y problemas renales", "category": "Bioquímica", "price": "18.00"},
-        {"name": "Transaminasas (TGO/TGP)", "description": "Evaluación de función hepática", "category": "Bioquímica", "price": "30.00"},
+        {"code": "BIO001", "name": "Glucosa en Ayunas", "description": "Medición de glucosa sanguínea", "category": "Bioquímica", "price": "10.00"},
+        {"code": "BIO002", "name": "Colesterol Total", "description": "Medición de colesterol en sangre", "category": "Bioquímica", "price": "15.00"},
+        {"code": "BIO003", "name": "Triglicéridos", "description": "Medición de triglicéridos en sangre", "category": "Bioquímica", "price": "15.00"},
+        {"code": "BIO004", "name": "Creatinina", "description": "Evaluación de función renal", "category": "Bioquímica", "price": "18.00"},
+        {"code": "BIO005", "name": "Urea", "description": "Evaluación de función renal", "category": "Bioquímica", "price": "16.00"},
+        {"code": "BIO006", "name": "Ácido Úrico", "description": "Detección de gota y problemas renales", "category": "Bioquímica", "price": "18.00"},
+        {"code": "BIO007", "name": "Transaminasas (TGO/TGP)", "description": "Evaluación de función hepática", "category": "Bioquímica", "price": "30.00"},
 
         # Inmunología
-        {"name": "Proteína C Reactiva (PCR)", "description": "Marcador de inflamación", "category": "Inmunología", "price": "25.00"},
-        {"name": "Factor Reumatoide", "description": "Detección de artritis reumatoide", "category": "Inmunología", "price": "35.00"},
-        {"name": "Antiestreptolisinas O (ASLO)", "description": "Detección de infecciones estreptocócicas", "category": "Inmunología", "price": "30.00"},
+        {"code": "INM001", "name": "Proteína C Reactiva (PCR)", "description": "Marcador de inflamación", "category": "Inmunología", "price": "25.00"},
+        {"code": "INM002", "name": "Factor Reumatoide", "description": "Detección de artritis reumatoide", "category": "Inmunología", "price": "35.00"},
+        {"code": "INM003", "name": "Antiestreptolisinas O (ASLO)", "description": "Detección de infecciones estreptocócicas", "category": "Inmunología", "price": "30.00"},
 
         # Microbiología
-        {"name": "Urocultivo", "description": "Cultivo de orina para detectar infecciones", "category": "Microbiología", "price": "40.00"},
-        {"name": "Coprocultivo", "description": "Cultivo de heces para detectar bacterias", "category": "Microbiología", "price": "45.00"},
-        {"name": "Antibiograma", "description": "Prueba de sensibilidad a antibióticos", "category": "Microbiología", "price": "35.00"},
+        {"code": "MIC001", "name": "Urocultivo", "description": "Cultivo de orina para detectar infecciones", "category": "Microbiología", "price": "40.00"},
+        {"code": "MIC002", "name": "Coprocultivo", "description": "Cultivo de heces para detectar bacterias", "category": "Microbiología", "price": "45.00"},
+        {"code": "MIC003", "name": "Antibiograma", "description": "Prueba de sensibilidad a antibióticos", "category": "Microbiología", "price": "35.00"},
 
         # Parasitología
-        {"name": "Examen Parasitológico de Heces", "description": "Detección de parásitos intestinales", "category": "Parasitología", "price": "20.00"},
-        {"name": "Test de Graham", "description": "Detección de oxiuros", "category": "Parasitología", "price": "18.00"},
+        {"code": "PAR001", "name": "Examen Parasitológico de Heces", "description": "Detección de parásitos intestinales", "category": "Parasitología", "price": "20.00"},
+        {"code": "PAR002", "name": "Test de Graham", "description": "Detección de oxiuros", "category": "Parasitología", "price": "18.00"},
 
         # Hormonas
-        {"name": "TSH (Hormona Estimulante de Tiroides)", "description": "Evaluación de función tiroidea", "category": "Hormonas", "price": "40.00"},
-        {"name": "T3 y T4", "description": "Hormonas tiroideas", "category": "Hormonas", "price": "50.00"},
-        {"name": "Beta HCG (Prueba de Embarazo)", "description": "Detección de embarazo", "category": "Hormonas", "price": "30.00"},
-        {"name": "Testosterona", "description": "Medición de hormona masculina", "category": "Hormonas", "price": "45.00"},
+        {"code": "HOR001", "name": "TSH (Hormona Estimulante de Tiroides)", "description": "Evaluación de función tiroidea", "category": "Hormonas", "price": "40.00"},
+        {"code": "HOR002", "name": "T3 y T4", "description": "Hormonas tiroideas", "category": "Hormonas", "price": "50.00"},
+        {"code": "HOR003", "name": "Beta HCG (Prueba de Embarazo)", "description": "Detección de embarazo", "category": "Hormonas", "price": "30.00"},
+        {"code": "HOR004", "name": "Testosterona", "description": "Medición de hormona masculina", "category": "Hormonas", "price": "45.00"},
 
         # Perfiles
-        {"name": "Perfil Lipídico Completo", "description": "Colesterol total, HDL, LDL, triglicéridos", "category": "Perfiles", "price": "45.00"},
-        {"name": "Perfil Hepático", "description": "TGO, TGP, bilirrubinas, fosfatasa alcalina", "category": "Perfiles", "price": "60.00"},
-        {"name": "Perfil Renal", "description": "Urea, creatinina, ácido úrico, electrolitos", "category": "Perfiles", "price": "55.00"},
-        {"name": "Perfil Tiroideo", "description": "TSH, T3, T4", "category": "Perfiles", "price": "80.00"},
-        {"name": "Chequeo Preventivo Básico", "description": "Hemograma, glucosa, colesterol, triglicéridos, orina", "category": "Perfiles", "price": "75.00"},
+        {"code": "PER001", "name": "Perfil Lipídico Completo", "description": "Colesterol total, HDL, LDL, triglicéridos", "category": "Perfiles", "price": "45.00"},
+        {"code": "PER002", "name": "Perfil Hepático", "description": "TGO, TGP, bilirrubinas, fosfatasa alcalina", "category": "Perfiles", "price": "60.00"},
+        {"code": "PER003", "name": "Perfil Renal", "description": "Urea, creatinina, ácido úrico, electrolitos", "category": "Perfiles", "price": "55.00"},
+        {"code": "PER004", "name": "Perfil Tiroideo", "description": "TSH, T3, T4", "category": "Perfiles", "price": "80.00"},
+        {"code": "PER005", "name": "Chequeo Preventivo Básico", "description": "Hemograma, glucosa, colesterol, triglicéridos, orina", "category": "Perfiles", "price": "75.00"},
     ]
 
     created_count = 0
@@ -135,6 +135,7 @@ async def create_services(session: AsyncSession, categories: dict[str, Category]
         else:
             category = categories[svc_data["category"]]
             service = Service(
+                code=svc_data["code"],
                 name=svc_data["name"],
                 description=svc_data["description"],
                 category_id=category.id,
