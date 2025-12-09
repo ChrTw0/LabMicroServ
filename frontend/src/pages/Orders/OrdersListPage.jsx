@@ -101,7 +101,6 @@ const OrdersListPage = () => {
 
       <div className="filters-section">
         <form onSubmit={handleSearch} className="filters-form">
-          <div className="filter-row">
             <input
               type="text"
               placeholder="Buscar por número de orden..."
@@ -151,7 +150,6 @@ const OrdersListPage = () => {
                 Limpiar
               </button>
             )}
-          </div>
         </form>
       </div>
 

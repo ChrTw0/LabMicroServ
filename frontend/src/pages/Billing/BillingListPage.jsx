@@ -125,7 +125,6 @@ const BillingListPage = () => {
 
       <div className="filters-section">
         <form onSubmit={handleSearch} className="filters-form">
-          <div className="filter-row">
             <input
               type="text"
               placeholder="Buscar por número de comprobante..."
@@ -187,7 +186,6 @@ const BillingListPage = () => {
                 Limpiar
               </button>
             )}
-          </div>
         </form>
       </div>
 

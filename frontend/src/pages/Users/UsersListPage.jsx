@@ -10,14 +10,17 @@ import './UsersListPage.css';
 const UsersListPage = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ total: 0, page: 1, page_size: 50 });
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState(''); // 'true', 'false', or ''
+  const [roleFilter, setRoleFilter] = useState('');
 
   useEffect(() => {
     fetchUsers(1);
+    fetchRoles();
   }, []);
 
   const fetchUsers = async (page = 1) => {
@@ -27,6 +30,7 @@ const UsersListPage = () => {
       const params = { page, page_size: 50 };
       if (searchTerm) params.search = searchTerm;
       if (statusFilter !== '') params.is_active = statusFilter === 'true';
+      if (roleFilter) params.role_id = roleFilter;
       
       const data = await userService.getAll(params);
       setUsers(data.users || []);
@@ -38,8 +42,24 @@ const UsersListPage = () => {
     }
   };
 
+  const fetchRoles = async () => {
+    try {
+        const rolesData = await userService.getRoles();
+        setRoles(rolesData);
+    } catch (err) {
+        console.error("Error fetching roles:", err);
+    }
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
+    fetchUsers(1);
+  };
+  
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('');
+    setRoleFilter('');
     fetchUsers(1);
   };
 
@@ -105,7 +125,18 @@ const UsersListPage = () => {
             <option value="true">Activo</option>
             <option value="false">Inactivo</option>
           </select>
+          <select 
+            value={roleFilter} 
+            onChange={(e) => setRoleFilter(e.target.value)}
+            className="filter-select"
+          >
+            <option value="">Todos los roles</option>
+            {roles.map(role => (
+                <option key={role.id} value={role.id}>{role.name}</option>
+            ))}
+          </select>
           <button type="submit" className="btn btn-secondary">Buscar</button>
+          <button type="button" onClick={handleClearFilters} className="btn btn-outline">Limpiar</button>
         </form>
       </div>
 

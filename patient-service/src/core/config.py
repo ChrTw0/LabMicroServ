@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     secret_key: str = Field(default="default-secret", env="SECRET_KEY")
     jwt_algorithm: str = Field(default="HS256", env="JWT_ALGORITHM")
     access_token_expire_minutes: int = Field(default=30, env="ACCESS_TOKEN_EXPIRE_MINUTES")
+    internal_api_key: str = Field(default="a-super-secret-internal-key", env="INTERNAL_API_KEY")
 
     # CORS
     cors_origins: List[str] = Field(

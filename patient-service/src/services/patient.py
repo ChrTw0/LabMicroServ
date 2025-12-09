@@ -1,10 +1,13 @@
 """
 Patient Service (Business logic)
 """
+import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from typing import Optional, List, Dict
+from loguru import logger
 
+from src.core.config import settings
 from src.models.patient import Patient, PatientNote, PatientHistory, DocumentType
 from src.repositories.patient import PatientRepository, PatientNoteRepository, PatientHistoryRepository
 from src.schemas.patient import (
@@ -87,7 +90,7 @@ class PatientService:
         data: PatientCreate,
         created_by: Optional[int] = None
     ) -> PatientResponse:
-        """Create a new patient"""
+        """Create a new patient and a corresponding user"""
         # Check if patient with document already exists
         existing = await PatientRepository.get_by_document(db, data.document_number)
         if existing:
@@ -109,6 +112,33 @@ class PatientService:
             created_by=created_by
         )
         patient = await PatientRepository.create(db, patient)
+
+        # Create user in user-service
+        if patient.email:
+            temp_password = f"P{patient.document_number}!"
+            user_data = {
+                "email": patient.email,
+                "password": temp_password,
+                "first_name": patient.first_name or "Usuario",
+                "last_name": patient.last_name or "Paciente",
+                "phone": patient.phone,
+                "role_ids": [6]  # Assuming 6 is the role ID for "Paciente"
+            }
+            try:
+                async with httpx.AsyncClient() as client:
+                    headers = {"X-Internal-API-Key": settings.internal_api_key}
+                    response = await client.post(
+                        f"{settings.user_service_url}/api/v1/internal/create-patient-user",
+                        json=user_data,
+                        headers=headers
+                    )
+                    response.raise_for_status()
+                    logger.info(f"Successfully created user for patient {patient.id}")
+            except httpx.HTTPStatusError as e:
+                logger.error(f"Error creating user for patient {patient.id}: {e.response.text}")
+            except Exception as e:
+                logger.error(f"An unexpected error occurred while creating user for patient {patient.id}: {e}")
+
         return PatientResponse.model_validate(patient)
 
     @staticmethod
