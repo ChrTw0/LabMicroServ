@@ -1,4 +1,4 @@
-/* Estilos para CatalogoPage.jsx */
+/* Estilos para InicioPage.jsx */
 
 /* Variables de color y fuentes */
 :root {
@@ -18,7 +18,7 @@
 }
 
 /* Estilos base del componente */
-.catalogo-page {
+.inicio-page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -29,7 +29,7 @@
 }
 
 /* --- Barra de Navegación (Header) --- */
-.catalogo-header {
+.inicio-header {
   position: sticky;
   top: 0;
   z-index: 50;
@@ -42,7 +42,7 @@
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
-.catalogo-header-content {
+.inicio-header-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -208,7 +208,7 @@
 
 /* --- Media Queries para Responsividad --- */
 @media (min-width: 640px) {
-  .catalogo-header-content { padding: 0.75rem 2.5rem; }
+  .inicio-header-content { padding: 0.75rem 2.5rem; }
   .hero-title { font-size: 3rem; }
   .hero-subtitle { font-size: 1.25rem; }
   .services-section { padding: 6rem 0; }

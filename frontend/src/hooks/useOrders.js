@@ -227,7 +227,7 @@ export const useCatalog = () => {
 
     try {
       const data = await catalogService.getAllCategories();
-      setCategories(data.categories || []);
+      setCategories(data || []);
     } catch (err) {
       setError(err.message || 'Error al cargar categorías');
       console.error('Error fetching categories:', err);

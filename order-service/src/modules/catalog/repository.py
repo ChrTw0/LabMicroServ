@@ -163,6 +163,13 @@ class ServiceRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
+    async def get_by_code(db: AsyncSession, code: str) -> Optional[Service]:
+        """Get service by code"""
+        query = select(Service).where(Service.code == code)
+        result = await db.execute(query)
+        return result.scalar_one_or_none()
+
+    @staticmethod
     async def create(db: AsyncSession, service: Service) -> Service:
         """Create a new service"""
         db.add(service)
