@@ -106,6 +106,13 @@ class InvoiceRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
+    async def get_all_by_order_id(db: AsyncSession, order_id: int) -> List[Invoice]:
+        """Get all invoices for a specific order ID"""
+        query = select(Invoice).where(Invoice.order_id == order_id)
+        result = await db.execute(query)
+        return list(result.scalars().all())
+
+    @staticmethod
     async def create(db: AsyncSession, invoice: Invoice) -> Invoice:
         """Create a new invoice"""
         db.add(invoice)

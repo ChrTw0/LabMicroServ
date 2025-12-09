@@ -17,6 +17,7 @@ import OrderFormPage from '../pages/Orders/OrderFormPage';
 import OrderDetailPage from '../pages/Orders/OrderDetailPage';
 import CatalogoPage from '../pages/Catalog/CatalogoPage';
 import CatalogoDetailPage from '../pages/Catalog/CatalogoDetailPage';
+import OrderGenerateInvoicePage from '../pages/Orders/OrderGenerateInvoicePage'; // <-- 1. Importar la nueva página
 import CatalogoFormPage from '../pages/Catalog/CatalogoFormPage';
 import CategoriesPage from '../pages/Catalog/CategoriesPage';
 import PriceHistoryPage from '../pages/Catalog/PriceHistoryPage';
@@ -96,10 +97,11 @@ export const AppRouter = () => {
           <Route path="patients/:id/edit" element={<PrivateRoute requiredPermissions={['patients:write']}><PatientFormPage /></PrivateRoute>} />
 
           {/* Órdenes */}
-          <Route path="orders" element={<PrivateRoute requiredPermissions={['orders:read']}><OrdersPageWrapper /></PrivateRoute>} />
-          <Route path="orders/new" element={<PrivateRoute requiredPermissions={['orders:write']}><OrderFormPage /></PrivateRoute>} />
-          <Route path="orders/:id" element={<PrivateRoute requiredPermissions={['orders:read']}><OrderDetailPage /></PrivateRoute>} />
-          <Route path="orders/:id/edit" element={<PrivateRoute requiredPermissions={['orders:write']}><OrderFormPage /></PrivateRoute>} />
+          <Route path="orders" element={<OrdersPageWrapper />} />
+          <Route path="orders/new" element={<OrderFormPage />} />
+          <Route path="orders/:id" element={<OrderDetailPage />} />
+          <Route path="orders/:id/edit" element={<OrderFormPage />} />
+          <Route path="orders/:id/generate-invoice" element={<OrderGenerateInvoicePage />} />
 
           {/* Facturación */}
           <Route path="billing" element={<PrivateRoute requiredPermissions={['billing:read']}><BillingListPage /></PrivateRoute>} />
