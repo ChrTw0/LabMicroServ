@@ -102,4 +102,28 @@ export const ENDPOINTS = {
     UPDATE: '/api/v1/profile',
     CHANGE_PASSWORD: '/api/v1/profile/password',
   },
+
+  // Reports
+  REPORTS: {
+    // Order Reports
+    PAYMENT_METHODS: '/api/v1/orders/reports/by-payment-method',
+    TOP_SERVICES: '/api/v1/orders/reports/top-services',
+    MONTHLY_REVENUE: '/api/v1/orders/reports/monthly-revenue',
+    PATIENT_TYPES: '/api/v1/orders/reports/patient-types',
+    // Billing Reports
+    SALES_BY_PERIOD: '/api/v1/invoices/reports/sales-by-period',
+    INVOICE_TYPES: '/api/v1/invoices/reports/by-invoice-type',
+  },
+
+  // Reconciliation
+  RECONCILIATION: {
+    CLOSURES: '/api/v1/reconciliation/closures',
+    CLOSURE_BY_ID: (id) => `/api/v1/reconciliation/closures/${id}`,
+    CLOSE: (id) => `/api/v1/reconciliation/closures/${id}/close`,
+    REOPEN: (id) => `/api/v1/reconciliation/closures/${id}/reopen`,
+    STATISTICS: '/api/v1/reconciliation/closures/statistics',
+    REPORT: '/api/v1/reconciliation/report',
+    ADD_DISCREPANCY: (closureId) => `/api/v1/reconciliation/closures/${closureId}/discrepancies`,
+    RESOLVE_DISCREPANCY: (discrepancyId) => `/api/v1/reconciliation/discrepancies/${discrepancyId}/resolve`,
+  },
 };

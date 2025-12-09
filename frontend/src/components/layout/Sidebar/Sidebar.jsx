@@ -47,6 +47,19 @@ const Sidebar = () => {
       label: 'Facturación',
       permissions: ['billing:read'],
     },
+    {
+      path: '/dashboard/reports',
+      icon: '📈',
+      label: 'Reportes',
+      permissions: null, // Todos los usuarios pueden ver reportes
+    },
+    {
+      path: '/dashboard/reconciliation',
+      icon: '🔄',
+      label: 'Conciliación',
+      permissions: null,
+      show: () => hasRole('Contador') || hasRole('Supervisor de Sede') || hasRole('Administrador General'),
+    },
   ];
 
   return (

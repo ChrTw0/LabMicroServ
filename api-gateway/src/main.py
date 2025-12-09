@@ -106,7 +106,7 @@ async def health_check():
 
 
 # Import and include routers (proxy routes to microservices)
-from src.routers import auth, users, roles, profile, patients, orders, billing, config
+from src.routers import auth, users, roles, profile, patients, orders, billing, config, reconciliation
 
 # User service routers
 app.include_router(auth.router)
@@ -122,6 +122,9 @@ app.include_router(orders.router)
 
 # Billing service router
 app.include_router(billing.router)
+
+# Reconciliation router (billing-service)
+app.include_router(reconciliation.router)
 
 # Configuration service routers (includes locations, company, settings)
 app.include_router(config.router)

@@ -93,3 +93,21 @@ async def resend_invoice_email(request: Request, invoice_id: int) -> Response:
     """Resend invoice by email"""
     target_url = f"{settings.billing_service_url}/api/v1/invoices/{invoice_id}/resend"
     return await proxy_request(request, target_url)
+
+
+# ============================================
+# REPORTING ENDPOINTS
+# ============================================
+
+@router.get("/reports/sales-by-period", tags=["Reports"])
+async def get_sales_by_period_report(request: Request) -> Response:
+    """Get sales report by period - RF-075"""
+    target_url = f"{settings.billing_service_url}/api/v1/invoices/reports/sales-by-period"
+    return await proxy_request(request, target_url)
+
+
+@router.get("/reports/by-invoice-type", tags=["Reports"])
+async def get_invoice_type_report(request: Request) -> Response:
+    """Get sales report by invoice type - RF-075"""
+    target_url = f"{settings.billing_service_url}/api/v1/invoices/reports/by-invoice-type"
+    return await proxy_request(request, target_url)

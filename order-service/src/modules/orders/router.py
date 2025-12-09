@@ -3,14 +3,15 @@ Order Router (API endpoints)
 """
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Optional
+from typing import Optional, List
 from datetime import date
 
 from src.core.database import get_db
 from src.modules.orders.service import OrderService
 from src.modules.orders.schemas import (
     OrderCreate, OrderUpdate, OrderUpdateStatus, OrderAddPayment,
-    OrderResponse, OrderDetailResponse, OrderListResponse, OrderStats
+    OrderResponse, OrderDetailResponse, OrderListResponse, OrderStats,
+    PaymentMethodStats, ServiceStats, MonthlyRevenueStats, PatientTypeStats
 )
 from src.modules.orders.models import OrderStatus
 
@@ -243,3 +244,94 @@ async def cancel_order(
     - Una orden anulada no puede cambiar de estado
     """
     return await OrderService.cancel_order(db, order_id)
+
+
+# ==================== REPORTING ENDPOINTS ====================
+
+@router.get(
+    "/reports/by-payment-method",
+    response_model=List[PaymentMethodStats],
+    summary="Reporte de ventas por método de pago - RF-077"
+)
+async def get_payment_method_report(
+    date_from: Optional[date] = Query(None, description="Fecha desde (YYYY-MM-DD)"),
+    date_to: Optional[date] = Query(None, description="Fecha hasta (YYYY-MM-DD)"),
+    location_id: Optional[int] = Query(None, description="Filtrar por sede"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Reporte de ventas por método de pago
+
+    Muestra:
+    - Total por cada método de pago (EFECTIVO, TARJETA, TRANSFERENCIA, YAPE_PLIN)
+    - Cantidad de transacciones
+    - Porcentaje sobre el total
+    """
+    return await OrderService.get_payment_method_report(db, date_from, date_to, location_id)
+
+
+@router.get(
+    "/reports/top-services",
+    response_model=List[ServiceStats],
+    summary="Top 10 servicios más solicitados - RF-076"
+)
+async def get_top_services_report(
+    date_from: Optional[date] = Query(None, description="Fecha desde (YYYY-MM-DD)"),
+    date_to: Optional[date] = Query(None, description="Fecha hasta (YYYY-MM-DD)"),
+    location_id: Optional[int] = Query(None, description="Filtrar por sede"),
+    limit: int = Query(10, ge=1, le=50, description="Cantidad de servicios a mostrar"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Top servicios más solicitados
+
+    Muestra:
+    - Servicios más vendidos (por defecto top 10)
+    - Cantidad vendida
+    - Ingresos generados
+    - Porcentaje de participación
+    """
+    return await OrderService.get_top_services_report(db, date_from, date_to, location_id, limit)
+
+
+@router.get(
+    "/reports/monthly-revenue",
+    response_model=List[MonthlyRevenueStats],
+    summary="Comparativa mensual de ventas - RF-079"
+)
+async def get_monthly_revenue_report(
+    months: int = Query(12, ge=1, le=24, description="Cantidad de meses a mostrar"),
+    location_id: Optional[int] = Query(None, description="Filtrar por sede"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Comparativa mensual de ventas
+
+    Muestra:
+    - Ingresos mensuales de los últimos N meses
+    - Total de órdenes por mes
+    - Valor promedio de orden
+    """
+    return await OrderService.get_monthly_revenue_report(db, months, location_id)
+
+
+@router.get(
+    "/reports/patient-types",
+    response_model=PatientTypeStats,
+    summary="Pacientes nuevos vs recurrentes - RF-078"
+)
+async def get_patient_types_report(
+    date_from: Optional[date] = Query(None, description="Fecha desde (YYYY-MM-DD)"),
+    date_to: Optional[date] = Query(None, description="Fecha hasta (YYYY-MM-DD)"),
+    location_id: Optional[int] = Query(None, description="Filtrar por sede"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Reporte de pacientes nuevos vs recurrentes
+
+    Muestra:
+    - Cantidad de pacientes nuevos (primera visita)
+    - Cantidad de pacientes recurrentes (con historial)
+    - Porcentajes de cada tipo
+    """
+    return await OrderService.get_patient_types_report(db, date_from, date_to, location_id)

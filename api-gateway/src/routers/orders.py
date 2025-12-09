@@ -218,3 +218,35 @@ async def retry_lab_sync(request: Request, log_id: int) -> Response:
     """Retry failed lab sync"""
     target_url = f"{settings.order_service_url}/api/v1/lab-sync/{log_id}/retry"
     return await proxy_request(request, target_url)
+
+
+# ============================================
+# REPORTING ENDPOINTS
+# ============================================
+
+@router.get("/orders/reports/by-payment-method", tags=["Reports"])
+async def get_payment_method_report(request: Request) -> Response:
+    """Get sales report by payment method - RF-077"""
+    target_url = f"{settings.order_service_url}/api/v1/orders/reports/by-payment-method"
+    return await proxy_request(request, target_url)
+
+
+@router.get("/orders/reports/top-services", tags=["Reports"])
+async def get_top_services_report(request: Request) -> Response:
+    """Get top services report - RF-076"""
+    target_url = f"{settings.order_service_url}/api/v1/orders/reports/top-services"
+    return await proxy_request(request, target_url)
+
+
+@router.get("/orders/reports/monthly-revenue", tags=["Reports"])
+async def get_monthly_revenue_report(request: Request) -> Response:
+    """Get monthly revenue comparison - RF-079"""
+    target_url = f"{settings.order_service_url}/api/v1/orders/reports/monthly-revenue"
+    return await proxy_request(request, target_url)
+
+
+@router.get("/orders/reports/patient-types", tags=["Reports"])
+async def get_patient_types_report(request: Request) -> Response:
+    """Get patient types report - RF-078"""
+    target_url = f"{settings.order_service_url}/api/v1/orders/reports/patient-types"
+    return await proxy_request(request, target_url)

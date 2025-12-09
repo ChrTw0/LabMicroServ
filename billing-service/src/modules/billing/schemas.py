@@ -88,3 +88,23 @@ class InvoiceStats(BaseModel):
     invoices_by_type: dict = Field(..., description="Comprobantes por tipo")
     invoices_by_status: dict = Field(..., description="Comprobantes por estado")
     total_billed: Decimal = Field(..., description="Total facturado")
+
+
+# ==================== Advanced Reporting Schemas ====================
+
+class SalesByPeriodStats(BaseModel):
+    """Sales statistics by period - RF-075"""
+    period: str = Field(..., description="Periodo (YYYY-MM)")
+    total_sales: Decimal = Field(..., description="Ventas totales")
+    total_invoices: int = Field(..., description="Cantidad de comprobantes")
+    total_tax: Decimal = Field(..., description="Total IGV")
+    avg_invoice_value: Decimal = Field(..., description="Valor promedio por comprobante")
+
+
+class InvoiceTypeStats(BaseModel):
+    """Statistics by invoice type - RF-075"""
+    invoice_type: str = Field(..., description="Tipo de comprobante (BOLETA/FACTURA)")
+    total_amount: Decimal = Field(..., description="Monto total")
+    count: int = Field(..., description="Cantidad de comprobantes")
+    percentage: float = Field(..., description="Porcentaje del total")
+    avg_value: Decimal = Field(..., description="Valor promedio")

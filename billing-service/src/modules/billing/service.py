@@ -30,7 +30,8 @@ from src.modules.billing.repository import InvoiceRepository, InvoiceItemReposit
 from src.modules.billing.schemas import (
     InvoiceCreate, InvoiceUpdateStatus,
     InvoiceResponse, InvoiceDetailResponse, InvoiceListResponse,
-    InvoiceItemResponse, InvoiceStats
+    InvoiceItemResponse, InvoiceStats,
+    SalesByPeriodStats, InvoiceTypeStats
 )
 
 from src.core.config import settings
@@ -698,3 +699,102 @@ class InvoiceService:
                 await send_email_with_attachments_async(patient_email, subject, body, attachments)
 
         return await InvoiceService.get_invoice_by_id(db, invoice.id)
+
+    # ==================== REPORTING METHODS ====================
+
+    @staticmethod
+    async def get_sales_by_period_report(
+        db: AsyncSession,
+        months: int = 12,
+        location_id: Optional[int] = None
+    ) -> List[SalesByPeriodStats]:
+        """Get sales report by period (monthly) - RF-075"""
+        from sqlalchemy import func, select
+        from datetime import datetime, timedelta
+
+        # Calculate date range
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=30 * months)
+
+        # Build query - usar literal_column para evitar problemas con PostgreSQL
+        from sqlalchemy import literal_column
+
+        period_expr = func.to_char(Invoice.issue_date, 'YYYY-MM')
+
+        query = select(
+            period_expr.label('period'),
+            func.sum(Invoice.total).label('total_sales'),
+            func.count(Invoice.id).label('total_invoices'),
+            func.sum(Invoice.tax).label('total_tax')
+        ).where(
+            Invoice.invoice_status != InvoiceStatus.CANCELLED,
+            Invoice.issue_date >= start_date
+        )
+
+        if location_id:
+            query = query.where(Invoice.location_id == location_id)
+
+        query = query.group_by(literal_column('period'))
+        query = query.order_by(literal_column('period'))
+
+        result = await db.execute(query)
+        rows = result.all()
+
+        stats = []
+        for row in rows:
+            avg_value = row.total_sales / row.total_invoices if row.total_invoices > 0 else Decimal(0)
+            stats.append(SalesByPeriodStats(
+                period=row.period,
+                total_sales=row.total_sales,
+                total_invoices=row.total_invoices,
+                total_tax=row.total_tax,
+                avg_invoice_value=avg_value
+            ))
+
+        return stats
+
+    @staticmethod
+    async def get_invoice_type_report(
+        db: AsyncSession,
+        date_from: Optional[date] = None,
+        date_to: Optional[date] = None,
+        location_id: Optional[int] = None
+    ) -> List[InvoiceTypeStats]:
+        """Get statistics by invoice type (BOLETA/FACTURA) - RF-075"""
+        from sqlalchemy import func, select
+
+        # Build query
+        query = select(
+            Invoice.invoice_type,
+            func.sum(Invoice.total).label('total_amount'),
+            func.count(Invoice.id).label('count')
+        ).where(Invoice.invoice_status != InvoiceStatus.CANCELLED)
+
+        if date_from:
+            query = query.where(Invoice.issue_date >= date_from)
+        if date_to:
+            query = query.where(Invoice.issue_date <= date_to)
+        if location_id:
+            query = query.where(Invoice.location_id == location_id)
+
+        query = query.group_by(Invoice.invoice_type)
+
+        result = await db.execute(query)
+        rows = result.all()
+
+        # Calculate total and percentages
+        grand_total = sum(row.total_amount for row in rows) if rows else Decimal(0)
+
+        stats = []
+        for row in rows:
+            percentage = float((row.total_amount / grand_total * 100)) if grand_total > 0 else 0.0
+            avg_value = row.total_amount / row.count if row.count > 0 else Decimal(0)
+            stats.append(InvoiceTypeStats(
+                invoice_type=row.invoice_type.value,
+                total_amount=row.total_amount,
+                count=row.count,
+                percentage=round(percentage, 2),
+                avg_value=avg_value
+            ))
+
+        return stats

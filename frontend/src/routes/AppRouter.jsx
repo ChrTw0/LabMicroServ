@@ -22,6 +22,8 @@ import PriceHistoryPage from '../pages/Catalog/PriceHistoryPage';
 import BillingListPage from '../pages/Billing/BillingListPage';
 import InvoiceDetailPage from '../pages/Billing/InvoiceDetailPage';
 import InvoiceFormPage from '../pages/Billing/InvoiceFormPage';
+import ReportsPage from '../pages/Reports/ReportsPage';
+import ReconciliationPage from '../pages/Reconciliation/ReconciliationPage';
 import { UsersListPage, UserFormPage, RolesListPage, RoleFormPage } from '../pages/Users';
 import NotFoundPage from '../pages/NotFound/NotFoundPage';
 import InicioPage from '../pages/Inicio/InicioPage';
@@ -102,6 +104,12 @@ export const AppRouter = () => {
           <Route path="billing" element={<BillingListPage />} />
           <Route path="billing/new" element={<InvoiceFormPage />} />
           <Route path="billing/:id" element={<InvoiceDetailPage />} />
+
+          {/* Reportes - RF-074 a RF-082 */}
+          <Route path="reports" element={<ReportsPage />} />
+
+          {/* Conciliación - RF-056 a RF-064 */}
+          <Route path="reconciliation" element={<PrivateRoute requiredRoles={['Contador', 'Supervisor de Sede', 'Administrador General']}><ReconciliationPage /></PrivateRoute>} />
 
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />

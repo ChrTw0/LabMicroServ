@@ -4,7 +4,7 @@ Incluye endpoints CRUD + tributarios (UBL, CDR, envío SUNAT)
 """
 from fastapi import APIRouter, Depends, status, Query, Path, Body
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Optional
+from typing import Optional, List
 from datetime import date
 import base64
 
@@ -12,7 +12,8 @@ from src.core.database import get_db
 from src.modules.billing.service import InvoiceService
 from src.modules.billing.schemas import (
     InvoiceCreate, InvoiceUpdateStatus,
-    InvoiceResponse, InvoiceDetailResponse, InvoiceListResponse, InvoiceStats
+    InvoiceResponse, InvoiceDetailResponse, InvoiceListResponse, InvoiceStats,
+    SalesByPeriodStats, InvoiceTypeStats
 )
 from src.modules.billing.models import InvoiceType, InvoiceStatus
 
@@ -307,3 +308,52 @@ async def resend_invoice_to_sunat(
     """
     result = await InvoiceService.generate_and_send_to_sunat(db, invoice_id)
     return result
+
+
+# ========================================
+# REPORTING ENDPOINTS
+# ========================================
+
+@router.get(
+    "/reports/sales-by-period",
+    response_model=List[SalesByPeriodStats],
+    summary="Reporte de ventas por periodo - RF-075"
+)
+async def get_sales_by_period_report(
+    months: int = Query(12, ge=1, le=24, description="Cantidad de meses a mostrar"),
+    location_id: Optional[int] = Query(None, description="Filtrar por sede"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Reporte de ventas mensuales
+
+    Muestra:
+    - Ventas totales por mes
+    - Cantidad de comprobantes por mes
+    - Total de impuestos (IGV) por mes
+    - Valor promedio de comprobante por mes
+    """
+    return await InvoiceService.get_sales_by_period_report(db, months, location_id)
+
+
+@router.get(
+    "/reports/by-invoice-type",
+    response_model=List[InvoiceTypeStats],
+    summary="Reporte de ventas por tipo de comprobante - RF-075"
+)
+async def get_invoice_type_report(
+    date_from: Optional[date] = Query(None, description="Fecha desde (YYYY-MM-DD)"),
+    date_to: Optional[date] = Query(None, description="Fecha hasta (YYYY-MM-DD)"),
+    location_id: Optional[int] = Query(None, description="Filtrar por sede"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Reporte de ventas por tipo de comprobante (BOLETA/FACTURA)
+
+    Muestra:
+    - Total por cada tipo de comprobante
+    - Cantidad de comprobantes por tipo
+    - Porcentaje sobre el total
+    - Valor promedio por tipo
+    """
+    return await InvoiceService.get_invoice_type_report(db, date_from, date_to, location_id)
