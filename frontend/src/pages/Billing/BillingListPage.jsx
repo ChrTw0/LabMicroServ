@@ -221,17 +221,17 @@ const BillingListPage = () => {
               invoices.map((invoice) => (
                 <tr key={invoice.id}>
                   <td>
-                    <strong>{invoice.document_number}</strong>
+                    <strong>{invoice.invoice_number}</strong>
                   </td>
                   <td>
-                    <span className={`badge ${getDocumentTypeBadge(invoice.document_type)}`}>
-                      {getDocumentTypeLabel(invoice.document_type)}
+                    <span className={`badge ${getDocumentTypeBadge(invoice.invoice_type)}`}>
+                      {getDocumentTypeLabel(invoice.invoice_type)}
                     </span>
                   </td>
                   <td>
                     <div className="customer-info">
                       <div>{invoice.customer_name}</div>
-                      <small className="text-muted">{invoice.customer_document}</small>
+                      <small className="text-muted">{invoice.customer_document_type} {invoice.customer_document_number}</small>
                     </div>
                   </td>
                   <td>{formatDate(invoice.issue_date)}</td>
@@ -241,8 +241,8 @@ const BillingListPage = () => {
                     </strong>
                   </td>
                   <td>
-                    <span className={`badge ${getStatusBadge(invoice.status)}`}>
-                      {getStatusLabel(invoice.status)}
+                    <span className={`badge ${getStatusBadge(invoice.invoice_status)}`}>
+                      {getStatusLabel(invoice.invoice_status)}
                     </span>
                   </td>
                   <td>

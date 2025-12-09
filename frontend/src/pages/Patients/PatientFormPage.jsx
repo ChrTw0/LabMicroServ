@@ -117,7 +117,7 @@ const PatientFormPage = () => {
 
       if (result.success) {
         alert(isEditMode ? 'Paciente actualizado correctamente' : 'Paciente creado correctamente');
-        navigate('/patients');
+        navigate('/dashboard/patients');
       } else {
         // Manejar errores de validación
         const errorMsg = typeof result.error === 'string'
@@ -147,7 +147,7 @@ const PatientFormPage = () => {
     <div className="patient-form-page">
       <div className="form-header">
         <h1>{isEditMode ? 'Editar Paciente' : 'Nuevo Paciente'}</h1>
-        <button onClick={() => navigate('/patients')} className="btn btn-outline">
+        <button onClick={() => navigate('/dashboard/patients')} className="btn btn-outline">
           ← Volver
         </button>
       </div>
@@ -295,7 +295,7 @@ const PatientFormPage = () => {
         <div className="form-actions">
           <button
             type="button"
-            onClick={() => navigate('/patients')}
+            onClick={() => navigate('/dashboard/patients')}
             className="btn btn-outline"
             disabled={loading}
           >

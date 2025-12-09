@@ -75,7 +75,7 @@ const InvoiceDetailPage = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${invoice.document_number}.xml`;
+      a.download = `${invoice.invoice_number}.xml`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -93,7 +93,7 @@ const InvoiceDetailPage = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `R-${invoice.document_number}.xml`;
+      a.download = `R-${invoice.invoice_number}.xml`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -163,11 +163,11 @@ const InvoiceDetailPage = () => {
       <div className="page-header">
         <div>
           <Link to="/dashboard/billing" className="btn-back">← Volver</Link>
-          <h1>{invoice.document_number}</h1>
-          <p className="document-type">{getDocumentTypeLabel(invoice.document_type)}</p>
+          <h1>{invoice.invoice_number}</h1>
+          <p className="document-type">{getDocumentTypeLabel(invoice.invoice_type)}</p>
         </div>
-        <span className={`badge ${getStatusBadge(invoice.status)}`}>
-          {getStatusLabel(invoice.status)}
+        <span className={`badge ${getStatusBadge(invoice.invoice_status)}`}>
+          {getStatusLabel(invoice.invoice_status)}
         </span>
       </div>
 
@@ -183,11 +183,11 @@ const InvoiceDetailPage = () => {
           <h2>Información del Comprobante</h2>
           <div className="detail-row">
             <span className="detail-label">N° Comprobante:</span>
-            <span className="detail-value"><strong>{invoice.document_number}</strong></span>
+            <span className="detail-value"><strong>{invoice.invoice_number}</strong></span>
           </div>
           <div className="detail-row">
             <span className="detail-label">Tipo:</span>
-            <span className="detail-value">{getDocumentTypeLabel(invoice.document_type)}</span>
+            <span className="detail-value">{getDocumentTypeLabel(invoice.invoice_type)}</span>
           </div>
           <div className="detail-row">
             <span className="detail-label">Fecha de Emisión:</span>
@@ -216,7 +216,7 @@ const InvoiceDetailPage = () => {
           </div>
           <div className="detail-row">
             <span className="detail-label">Documento:</span>
-            <span className="detail-value">{invoice.customer_document}</span>
+            <span className="detail-value">{invoice.customer_document_type} {invoice.customer_document_number}</span>
           </div>
           {invoice.customer_address && (
             <div className="detail-row">
@@ -269,7 +269,7 @@ const InvoiceDetailPage = () => {
               </tr>
               <tr>
                 <td colSpan="3" className="text-right">IGV (18%):</td>
-                <td>{formatCurrency(invoice.igv || 0)}</td>
+                <td>{formatCurrency(invoice.tax || 0)}</td>
               </tr>
               <tr className="total-row">
                 <td colSpan="3" className="text-right"><strong>TOTAL:</strong></td>
@@ -281,14 +281,14 @@ const InvoiceDetailPage = () => {
       </div>
 
       {/* Información de SUNAT */}
-      {invoice.status !== 'DRAFT' && (
+      {invoice.invoice_status !== 'DRAFT' && (
         <div className="detail-card full-width">
           <h2>Estado SUNAT</h2>
           <div className="sunat-info">
             <div className="detail-row">
               <span className="detail-label">Estado:</span>
-              <span className={`badge ${getStatusBadge(invoice.status)}`}>
-                {getStatusLabel(invoice.status)}
+              <span className={`badge ${getStatusBadge(invoice.invoice_status)}`}>
+                {getStatusLabel(invoice.invoice_status)}
               </span>
             </div>
             {invoice.sunat_response_code && (
@@ -317,7 +317,7 @@ const InvoiceDetailPage = () => {
       <div className="actions-card">
         <h2>Acciones</h2>
         <div className="actions-buttons">
-          {invoice.status === 'DRAFT' && (
+          {invoice.invoice_status === 'DRAFT' && (
             <button
               onClick={handleSendToSUNAT}
               className="btn btn-primary"
@@ -327,12 +327,12 @@ const InvoiceDetailPage = () => {
             </button>
           )}
 
-          {invoice.status === 'SENT' || invoice.status === 'ACCEPTED' ? (
+          {invoice.invoice_status === 'SENT' || invoice.invoice_status === 'ACCEPTED' ? (
             <>
               <button onClick={handleDownloadUBL} className="btn btn-secondary">
                 📄 Descargar XML/UBL
               </button>
-              {invoice.status === 'ACCEPTED' && (
+              {invoice.invoice_status === 'ACCEPTED' && (
                 <button onClick={handleDownloadCDR} className="btn btn-secondary">
                   📥 Descargar CDR
                 </button>
@@ -340,7 +340,7 @@ const InvoiceDetailPage = () => {
             </>
           ) : null}
 
-          {(invoice.status === 'ACCEPTED' || invoice.status === 'SENT') && (
+          {(invoice.invoice_status === 'ACCEPTED' || invoice.invoice_status === 'SENT') && (
             <button
               onClick={() => setShowVoidModal(true)}
               className="btn btn-danger"

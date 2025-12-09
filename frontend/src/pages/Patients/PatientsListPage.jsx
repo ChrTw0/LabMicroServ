@@ -53,7 +53,7 @@ const PatientsListPage = () => {
     <div className="patients-list-page">
       <div className="page-header">
         <h1>Gestión de Pacientes</h1>
-        <Link to="/patients/new" className="btn btn-primary">
+        <Link to="/dashboard/patients/new" className="btn btn-primary">
           + Nuevo Paciente
         </Link>
       </div>

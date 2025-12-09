@@ -10,7 +10,7 @@ import {
   LaboratoristaDashboard,
   ContadorDashboard,
   PacienteDashboard,
-} from '../dashboard';
+} from '.';
 import './DashboardPage.css';
 
 const roleDashboards = {

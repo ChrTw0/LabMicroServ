@@ -15,6 +15,13 @@ async def list_invoices(request: Request) -> Response:
     return await proxy_request(request, target_url)
 
 
+@router.get("/statistics")
+async def get_billing_statistics(request: Request) -> Response:
+    """Get billing statistics"""
+    target_url = f"{settings.billing_service_url}/api/v1/invoices/statistics"
+    return await proxy_request(request, target_url)
+
+
 @router.get("/{invoice_id}")
 async def get_invoice(request: Request, invoice_id: int) -> Response:
     """Get invoice by ID"""
@@ -53,13 +60,6 @@ async def cancel_invoice(request: Request, invoice_id: int) -> Response:
 async def update_invoice_status(request: Request, invoice_id: int) -> Response:
     """Update invoice status"""
     target_url = f"{settings.billing_service_url}/api/v1/invoices/{invoice_id}/status"
-    return await proxy_request(request, target_url)
-
-
-@router.get("/statistics")
-async def get_billing_statistics(request: Request) -> Response:
-    """Get billing statistics"""
-    target_url = f"{settings.billing_service_url}/api/v1/invoices/statistics"
     return await proxy_request(request, target_url)
 
 
