@@ -17,6 +17,12 @@ const Sidebar = () => {
       permissions: null, // Todos los usuarios
     },
     {
+      path: '/dashboard/usuarios',
+      icon: '🔑',
+      label: 'Gestión de usuarios',
+      permissions: null, // Todos los usuarios (provisional)
+    },
+    {
       path: '/dashboard/catalog',
       icon: '💉',
       label: 'Catálogo',
@@ -66,6 +72,7 @@ const Sidebar = () => {
               key={item.path}
               to={item.path}
               className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
+              end={item.path === '/dashboard'}
             >
               <span className="nav-icon">{item.icon}</span>
               <span className="nav-label">{item.label}</span>

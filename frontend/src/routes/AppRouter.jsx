@@ -24,6 +24,7 @@ import InvoiceDetailPage from '../pages/Billing/InvoiceDetailPage';
 import InvoiceFormPage from '../pages/Billing/InvoiceFormPage';
 import NotFoundPage from '../pages/NotFound/NotFoundPage';
 import InicioPage from '../pages/Inicio/InicioPage';
+import ProfilePage from '../pages/Profile/ProfilePage';
 
 // Layout
 import Layout from '../components/layout/Layout/Layout';
@@ -64,8 +65,11 @@ export const AppRouter = () => {
           }
         >
           {/* Dashboard */}
-          <Route index element={<DashboardPage />} />
-          {/* <Route path="dashboard" element={<DashboardPage />} /> */}
+          {/* <Route index element={<DashboardPage />} /> */}
+          <Route path="" element={<DashboardPage />} />
+
+          {/* Profile */}
+          <Route path="profile" element={<ProfilePage />} />
 
           {/* Catálogo de Servicios */}
           <Route path="catalog" element={<CatalogoPage />} />

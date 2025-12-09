@@ -95,4 +95,11 @@ export const ENDPOINTS = {
     RETRY: (id) => `/api/v1/lab-sync/${id}/retry`,
     STATISTICS: '/api/v1/lab-sync/statistics',
   },
+
+  // Profile
+  PROFILE: {
+    GET: '/api/v1/profile',
+    UPDATE: '/api/v1/profile',
+    CHANGE_PASSWORD: '/api/v1/profile/password',
+  },
 };
