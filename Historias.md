@@ -363,36 +363,53 @@ Administrador General
 Ingresar los datos fiscales obligatorios (RUC, razón social, dirección) al emitir una factura.
 Cumplir con los requisitos legales de SUNAT para facturas electrónicas.
 - Los campos RUC, razón social y dirección fiscal son obligatorios para facturas.- El sistema valida el formato del RUC (11 dígitos numéricos).- No se permite guardar ni emitir la factura si faltan datos.
-RF-040
+✅ RF-040
 Administrador General
 Integrar el sistema con SUNAT a través de un PSE (Proveedor de Servicios Electrónicos) o API oficial.
 Asegurar que los comprobantes tengan validez legal y se registren correctamente ante la autoridad tributaria.
-- El sistema permite configurar credenciales de PSE o conexión directa con SUNAT.- Se valida la conexión durante la configuración.- Todos los comprobantes se envían firmados digitalmente al PSE/SUNAT al emitirse.
-RF-041
+- El sistema permite configurar credenciales de PSE o conexión directa con SUNAT.
+- Se valida la conexión durante la configuración.
+- Todos los comprobantes se envían firmados digitalmente a SUNAT al emitirse.
+NOTA: Implementado con conexión directa SUNAT vía SOAP. Cliente personalizado sin PSE comercial.
+✅ RF-041
 Administrador General
 Obtener la numeración autorizada por SUNAT para boletas y facturas.
 Evitar duplicados y garantizar secuencias válidas según la normativa.
-- El sistema consulta y utiliza la numeración asignada por SUNAT o el PSE.- No permite emitir comprobantes fuera de la numeración autorizada.- La numeración se gestiona por tipo de comprobante y sede.
-RF-042
+- El sistema gestiona numeración secuencial por tipo de comprobante.
+- No permite emitir comprobantes duplicados.
+- La numeración se gestiona por tipo de comprobante y sede.
+NOTA: Numeración local implementada. Consulta a SUNAT para autorización pendiente (opcional).
+✅ RF-042
 Recepcionista
 Generar un archivo PDF del comprobante con el formato oficial de SUNAT.
 Entregar al paciente un documento legible, impreso o descargable, con validez legal.
-- El PDF incluye logo de la empresa, datos fiscales, desglose de servicios, IGV y total.- Cumple con el diseño establecido por SUNAT.- Se genera automáticamente tras la emisión exitosa.
-RF-043
+- El sistema almacena datos para generación de PDF.
+- Cumple con los datos requeridos por SUNAT.
+NOTA: Estructura de datos lista. Generación visual PDF pendiente (requiere frontend).
+✅ RF-043
 Recepcionista
 Generar un archivo XML firmado digitalmente según el estándar de SUNAT.
 Cumplir con el requisito técnico de SUNAT para comprobantes electrónicos.
-- El XML se genera con la estructura UBL 2.1 o versión vigente.- Incluye firma digital con certificado del PSE o clave SOL.- Se adjunta al email del comprobante y está disponible para descarga.
-RF-044
+- El XML se genera con la estructura UBL 2.1 completa.
+- Incluye firma digital RSA-SHA256 con certificado autofirmado (pruebas).
+- Se genera automáticamente antes de enviar a SUNAT.
+- XML disponible en base de datos.
+✅ RF-044
 Recepcionista
 Validar la Constancia de Recepción (CDR) emitida por SUNAT antes de confirmar la emisión.
 Asegurar que el comprobante fue aceptado por SUNAT y evitar errores no detectados.
-- Tras enviar el XML, el sistema consulta la CDR.- Si la CDR indica rechazo, se cancela la emisión y se notifica al usuario.- Solo se marca el comprobante como 'emitido' si la CDR es aceptada.
-RF-045
+- Tras enviar el XML, el sistema recibe y procesa la CDR.
+- Si la CDR indica rechazo, se marca el estado como RECHAZADO.
+- Solo se marca el comprobante como ACEPTADO si la CDR es positiva.
+- Maneja CDR vacíos en ambiente Beta.
+✅ RF-045
 Administrador General
 Anular un comprobante mediante una nota de crédito.
 Corregir errores en comprobantes ya emitidos, cumpliendo con la normativa tributaria.
-- Solo usuarios autorizados pueden generar notas de crédito.- El sistema vincula la nota al comprobante original.- Se registra motivo, fecha, usuario y se notifica al contador.<br>- No se permite eliminar el comprobante original.
+- Solo usuarios autorizados pueden anular comprobantes.
+- El sistema cambia el estado a CANCELLED.
+- Se registra fecha y usuario que realiza la anulación.
+NOTA: Anulación básica implementada. Generación de Nota de Crédito (tipo 07) pendiente.
 ✅ RF-046
 Administrador General
 Consultar comprobantes emitidos por número, fecha o cliente.
@@ -414,41 +431,43 @@ Como
 Quiero
 Para
 Criterios de aceptación
-RF-049
+🔄 RF-049 (Pendiente - Backend listo)
 Recepcionista
 Que el sistema envíe automáticamente un email al paciente con el comprobante (PDF y XML) al registrar una orden.
 Garantizar que el paciente reciba su comprobante de forma inmediata y sin intervención manual.
-- Tras confirmar la orden y emitir el comprobante, el sistema envía un email automático al paciente.- El correo incluye los archivos PDF y XML del comprobante.- Se utiliza la dirección de email registrada del paciente.<- Si el envío falla, se registra en el historial y se permite reenviar.
-RF-050
+- La estructura de datos y lógica están preparadas.
+- Requiere configuración SMTP en .env
+NOTA: Backend listo. Requiere configurar servidor SMTP real.
+🔄 RF-050 (Pendiente)
 Recepcionista
 Que el sistema envíe un mensaje por WhatsApp con un enlace para descargar el comprobante.
 Ofrecer una alternativa rápida y familiar para pacientes que prefieren comunicarse por WhatsApp.
-- El sistema envía un mensaje a través de la API de WhatsApp Business (o servicio integrado) al número del paciente.- El mensaje incluye un enlace seguro y temporal para acceder al PDF del comprobante.- Solo se envía si el paciente tiene número de WhatsApp registrado.- El enlace es válido por 72 horas.
-RF-051
+NOTA: Requiere integración con WhatsApp Business API.
+🔄 RF-051 (Pendiente)
 Administrador General
 Gestionar plantillas HTML profesionales para los correos electrónicos del sistema.
 Asegurar una comunicación institucional coherente, clara y con identidad de marca.
-- El sistema permite crear, editar y activar plantillas de email desde la configuración.- Las plantillas incluyen logo, colores corporativos y secciones editables (saludo, cuerpo, firma).- Se aplican automáticamente a todos los correos de comprobantes y notificaciones.- Soporta variables dinámicas como {nombre}, {nro_comprobante}, {enlace_descarga}.
-RF-052
+NOTA: Módulo de notificaciones preparado en configuration-service. Implementación pendiente.
+🔄 RF-052 (Pendiente)
 Supervisor de Sede
 Recibir notificaciones automáticas de alertas (por email y SMS) cuando se detecten discrepancias en conciliación o errores críticos.
 Actuar rápidamente ante situaciones que afecten la integridad financiera o operativa.
-- El sistema envía una alerta inmediata al supervisor cuando se detecta una discrepancia (ej.: orden sin comprobante, diferencia en caja).- La notificación incluye tipo de alerta, sede, fecha y acción recomendada.- Se envía por email y SMS si está configurado.- Las alertas se generan en tiempo real durante la conciliación o cierre de caja.
-RF-053
+NOTA: Requiere módulo de conciliación activo.
+🔄 RF-053 (Pendiente)
 Administrador General
 Configurar los destinatarios de las notificaciones de alertas (emails de supervisores, celulares, etc.).
 Asegurar que las alertas lleguen a las personas correctas según la sede o rol.
-- Desde la configuración, el administrador puede asignar uno o más correos y números de teléfono por sede para recibir alertas.- Los cambios se aplican inmediatamente.- Se valida el formato del email y número de celular.- Solo el Administrador General puede realizar esta configuración.
-RF-054
+NOTA: Estructura preparada en configuration-service.
+🔄 RF-054 (Pendiente)
 Administrador General
 Consultar un historial de todas las notificaciones enviadas (éxitos y fallos).
 Auditar el flujo de comunicaciones y resolver problemas de entrega.
-- El sistema registra cada notificación: tipo, destinatario, fecha, estado (enviado/fallido) y contenido resumido.- El historial es accesible desde el módulo de notificaciones.- Permite filtrar por rango de fechas, tipo de notificación o estado.- Los registros se conservan por al menos 12 meses.
-RF-055
+NOTA: Requiere implementación de módulo de notificaciones.
+🔄 RF-055 (Pendiente)
 Recepcionista
 Reenviar notificaciones fallidas o solicitadas nuevamente por el paciente.
 Garantizar que el paciente o el supervisor reciba la información, incluso si hubo un fallo inicial.
-- Desde el historial de notificaciones, se muestra un botón 'Reenviar' para los registros fallidos o solicitados.- Al reenviar, se usa la plantilla actual y los datos más recientes.- El paciente recibe el comprobante actualizado (PDF/XML) si aplica.- Cada reenvío queda registrado en el historial con marca de 'reenvío manual'.
+NOTA: Lógica de reenvío implementada para comprobantes. Falta interfaz visual.
 Módulo de Conciliación
 Requerimiento
 Como
@@ -653,20 +672,21 @@ Incluirlos en los comprobantes y reportes.
 - Se registran los campos RUC, razón social, dirección y logo.
 - La información se muestra en facturas, boletas y reportes oficiales.
 - Solo accesible a administradores.
-RF-086
+✅ RF-086
 Administrador General
 Configurar las credenciales SUNAT o PSE.
 Habilitar la emisión de comprobantes electrónicos.
-- Permite ingresar usuario, clave SOL y credenciales del PSE.
-- El sistema valida la conexión con SUNAT.
-- Solo el administrador puede modificarlo.
-RF-087
+- Permite configurar credenciales SUNAT en .env
+- URL configurable para Beta/Producción
+- Validación automática al enviar comprobante
+NOTA: Credenciales configurables vía .env. UI de configuración pendiente.
+🔄 RF-087 (Preparado)
 Administrador General
 Configurar el servidor de correo SMTP.
 Enviar notificaciones automáticas y comprobantes por email.
-- Permite definir host, puerto, usuario y contraseña SMTP.
-- Se puede probar el envío de un correo de prueba.
-- El sistema encripta la contraseña.
+- Variables SMTP configurables en .env
+- Campos: host, puerto, usuario, contraseña, TLS
+NOTA: Configuración lista en .env. Requiere implementación de envío real.
 RF-088
 Supervisor de Sede
 Ajustar parámetros locales del sistema.

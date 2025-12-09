@@ -14,7 +14,14 @@ import PatientFormPage from '../pages/Patients/PatientFormPage';
 import OrdersListPage from '../pages/Orders/OrdersListPage';
 import PatientOrdersListPage from '../pages/Orders/PatientOrdersListPage'; // Importar la nueva página
 import OrderFormPage from '../pages/Orders/OrderFormPage';
+import OrderDetailPage from '../pages/Orders/OrderDetailPage';
+import CatalogoPage from '../pages/Catalog/CatalogoPage';
+import CatalogoFormPage from '../pages/Catalog/CatalogoFormPage';
+import CategoriesPage from '../pages/Catalog/CategoriesPage';
+import PriceHistoryPage from '../pages/Catalog/PriceHistoryPage';
 import BillingListPage from '../pages/Billing/BillingListPage';
+import InvoiceDetailPage from '../pages/Billing/InvoiceDetailPage';
+import InvoiceFormPage from '../pages/Billing/InvoiceFormPage';
 import NotFoundPage from '../pages/NotFound/NotFoundPage';
 import InicioPage from '../pages/Inicio/InicioPage';
 
@@ -60,9 +67,12 @@ export const AppRouter = () => {
           <Route index element={<DashboardPage />} />
           {/* <Route path="dashboard" element={<DashboardPage />} /> */}
 
-
-          {/* Catálogo */}
-          {/* <Route path="servicios" element={<CatalogoPage />}/> */}
+          {/* Catálogo de Servicios */}
+          <Route path="catalog" element={<CatalogoPage />} />
+          <Route path="catalog/new" element={<CatalogoFormPage />} />
+          <Route path="catalog/:id/edit" element={<CatalogoFormPage />} />
+          <Route path="catalog/:id/price-history" element={<PriceHistoryPage />} />
+          <Route path="catalog/categories" element={<CategoriesPage />} />
 
           {/* Pacientes */}
           {/* TODO: Proteger estas rutas con `hasPermission` */}
@@ -73,10 +83,13 @@ export const AppRouter = () => {
           {/* Órdenes */}
           <Route path="orders" element={<OrdersPageWrapper />} />
           <Route path="orders/new" element={<OrderFormPage />} />
+          <Route path="orders/:id" element={<OrderDetailPage />} />
           <Route path="orders/:id/edit" element={<OrderFormPage />} />
 
           {/* Facturación */}
           <Route path="billing" element={<BillingListPage />} />
+          <Route path="billing/new" element={<InvoiceFormPage />} />
+          <Route path="billing/:id" element={<InvoiceDetailPage />} />
 
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />

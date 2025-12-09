@@ -17,10 +17,10 @@ const Sidebar = () => {
       permissions: null, // Todos los usuarios
     },
     {
-      path: '/dashboard/servicios',
+      path: '/dashboard/catalog',
       icon: '💉',
-      label: 'Servicios',
-      permissions: null, // Todos los usuarios
+      label: 'Catálogo',
+      permissions: null, // Todos los usuarios pueden ver el catálogo
     },
     {
       path: '/dashboard/patients',

@@ -271,6 +271,16 @@ class OrderService:
             for payment in data.payments
         ]
         await OrderPaymentRepository.create_many(db, payments)
+
+        # Calculate new balance after payments
+        new_balance = balance - new_payments_total
+
+        # Auto-update order status when fully paid
+        if new_balance <= 0 and order.status == OrderStatus.REGISTRADA:
+            # If order was just registered and now is fully paid, move to EN_PROCESO
+            order.status = OrderStatus.EN_PROCESO
+            await OrderRepository.update(db, order)
+
         await db.commit()
 
         # Reload order with details

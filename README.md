@@ -69,11 +69,31 @@ El sistema está compuesto por 6 microservicios independientes + API Gateway:
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/ChrTw0/LabMicroServ.git
 cd LabMicroServ
 ```
 
-### 2. Levantar los servicios con Docker Compose
+### 2. Configurar variables de entorno
+
+Cada servicio tiene su archivo `.env`. Las configuraciones por defecto funcionan para desarrollo local:
+
+```bash
+# Revisar archivos .env en cada servicio
+ls *-service/.env
+
+# Los valores por defecto ya están configurados para:
+# - Bases de datos PostgreSQL en Docker
+# - Credenciales SUNAT Beta (pruebas)
+# - Puertos estándar (8001-8006, 8000)
+```
+
+**⚠️ IMPORTANTE para PRODUCCIÓN:**
+- Cambiar todas las contraseñas de bases de datos
+- Configurar certificado digital SUNAT real
+- Actualizar SECRET_KEY en cada servicio
+- Configurar SMTP real para notificaciones
+
+### 3. Levantar los servicios con Docker Compose
 
 ```bash
 # Levantar todos los servicios (bases de datos + microservicios)
@@ -83,36 +103,57 @@ docker-compose up -d
 docker-compose logs -f
 
 # Ver logs de un servicio específico
-docker-compose logs -f user-service
+docker-compose logs -f billing-service
+
+# Ver estado de contenedores
+docker-compose ps
 ```
 
-### 3. Ejecutar migraciones de base de datos
+### 4. Instalar dependencias (si hay nuevas)
+
+```bash
+# Si agregaste nuevas dependencias, reinstalar en cada servicio
+docker exec labmic_billing_service pip install -r requirements.txt
+docker exec labmic_user_service pip install -r requirements.txt
+# etc.
+```
+
+### 5. Ejecutar migraciones de base de datos
 
 ```bash
 # User Service
-docker-compose exec user-service alembic upgrade head
+docker exec labmic_user_service alembic upgrade head
 
 # Patient Service
-docker-compose exec patient-service alembic upgrade head
+docker exec labmic_patient_service alembic upgrade head
 
 # Order Service
-docker-compose exec order-service alembic upgrade head
+docker exec labmic_order_service alembic upgrade head
 
 # Billing Service
-docker-compose exec billing-service alembic upgrade head
+docker exec labmic_billing_service alembic upgrade head
 
 # Configuration Service
-docker-compose exec configuration-service alembic upgrade head
+docker exec labmic_configuration_service alembic upgrade head
 ```
 
-### 4. Poblar datos iniciales (Seed)
+### 6. Poblar datos iniciales (Seed)
 
 ```bash
-# Creación de registros
-docker-compose exec user-service python seed_data.py
-docker-compose exec patient-service python seed_data.py
-docker-compose exec order-service python seed_data.py
-docker-compose exec billing-service python seed_data.py
+# Datos de usuarios y roles
+docker exec labmic_user_service python seed_data.py
+
+# Datos de pacientes de prueba
+docker exec labmic_patient_service python seed_data.py
+
+# Catálogo de servicios y órdenes de prueba
+docker exec labmic_order_service python seed_data.py
+
+# Facturas y boletas de prueba (incluye service_code)
+docker exec labmic_billing_service python seed_data.py
+
+# Configuración de empresa y sedes
+docker exec labmic_configuration_service python seed_data.py
 ```
 
 ### Credenciales de Usuario por Defecto:
@@ -128,7 +169,7 @@ docker-compose exec billing-service python seed_data.py
 | Contador              | `contador@labclinico.com`  | `Contador123`      |
 | Paciente              | `paciente@labclinico.com`  | `Paciente123`      |
 
-### 5. Verificar que los servicios estén corriendo
+### 7. Verificar que los servicios estén corriendo
 
 ```bash
 # Health checks
@@ -137,9 +178,10 @@ curl http://localhost:8002/health  # Patient Service
 curl http://localhost:8003/health  # Order Service
 curl http://localhost:8004/health  # Billing Service
 curl http://localhost:8005/health  # Configuration Service
+curl http://localhost:8000/health  # API Gateway
 ```
 
-### 6. Acceder a la documentación API (Swagger UI)
+### 8. Acceder a la documentación API (Swagger UI)
 
 - **User Service:** http://localhost:8001/docs
 - **Patient Service:** http://localhost:8002/docs
@@ -358,14 +400,40 @@ LabMicroServ/
 
 **Base de datos:** `order_db` (9 tablas)
 
-### 4. Billing Service (Port 8004) 🔧
-**Estado:** Base de datos configurada, pendiente implementación
+### 4. Billing Service (Port 8004) ✅
+**Estado:** Funcional - Integración SUNAT completada
+
+**Funcionalidades:**
+- ✅ Generación XML UBL 2.1 (estándar SUNAT)
+- ✅ Firma digital de comprobantes
+- ✅ Envío a SUNAT Beta/Producción vía SOAP
+- ✅ Emisión de Facturas (01) y Boletas (03)
+- ✅ Procesamiento de CDR (Constancia de Recepción)
+- ✅ Manejo de estados tributarios
+- ✅ CRUD completo de facturas
+- ✅ Estadísticas y reportes de facturación
+- ✅ Anulación de comprobantes
+- ✅ Reenvío a SUNAT
 
 **Módulos:**
-- **Billing:** Facturación electrónica SUNAT
-- **Reconciliation:** Conciliación y cierre de caja
+- **Billing:** Facturación electrónica SUNAT ✅
+- **SUNAT Integration:** Cliente SOAP + generador XML UBL 2.1 ✅
+- **Reconciliation:** Conciliación y cierre de caja 🔧
 
-**Base de datos:** `billing_db` (4 tablas)
+**Endpoints disponibles:** 15+
+- Creación de facturas/boletas
+- Consulta y filtros
+- Envío/reenvío a SUNAT
+- Descarga de XML/CDR
+- Anulación
+- Estadísticas
+
+**Base de datos:** `billing_db` (5 tablas)
+
+**Integración SUNAT:**
+- Ambiente Beta configurado (credenciales MODDATOS)
+- Certificado autofirmado para pruebas
+- Listo para producción (requiere certificado real)
 
 ### 5. Configuration Service (Port 8005) ✅
 **Estado:** Funcional
@@ -407,7 +475,7 @@ LabMicroServ/
 | `user_db` | 5432 | user-service | 5 | ✅ Migrado |
 | `patient_db` | 5433 | patient-service | 3 | ✅ Migrado |
 | `order_db` | 5434 | order-service | 9 | ✅ Migrado |
-| `billing_db` | 5435 | billing-service | 4 | ✅ Migrado |
+| `billing_db` | 5435 | billing-service | 5 | ✅ Migrado |
 | `config_db` | 5436 | configuration-service | 5 | ✅ Migrado |
 
 ### Credenciales por defecto (Development):
@@ -544,7 +612,12 @@ pytest tests/test_auth.py -v
 - **[Modelos SQLAlchemy](docs/MODELOS_SQLALCHEMY.md)** - Esquemas de BD
 - **[Requerimientos](Requirements.md)** - Especificaciones funcionales
 - **[Sprint 1](Sprint1.md)** - Planning del sprint actual
-- **[Historias de Usuario](Historias.md)** - User stories completas
+- **[Historias de Usuario](historias.md)** - User stories completas
+
+### Sesiones de Desarrollo
+- **[Sesión 2](sesion2.md)** - Configuración inicial y estructura base
+- **[Sesión 3](sesion3.md)** - API Gateway, RBAC y dashboards por rol
+- **[Sesión 4](sesion4.md)** - **Integración SUNAT** (UBL 2.1, firma digital, SOAP client)
 
 ## 🔒 Seguridad
 
@@ -582,11 +655,12 @@ pytest tests/test_auth.py -v
 ### Futuro (Sprints 2-4)
 - [ ] Gestión de pacientes completa
 - [ ] Integración con laboratorio (LIS)
-- [ ] Facturación electrónica SUNAT
+- [x] **Facturación electrónica SUNAT** ✅ (Completado en Sesión 4)
 - [ ] Notificaciones (Email, WhatsApp)
 - [ ] Sistema de backup automático
 - [ ] Dashboard analítico
 - [ ] Exportación de reportes
+- [ ] Frontend de facturación (módulo visual)
 
 ## 👥 Equipo
 
@@ -603,5 +677,5 @@ Este proyecto es privado y confidencial.
 
 ---
 
-**Última actualización:** 20 de noviembre de 2025
-**Versión:** 0.1.0 (Sprint 1 - En progreso)
+**Última actualización:** 8 de diciembre de 2025
+**Versión:** 0.2.0 (Sprint 1 - Integración SUNAT completada)

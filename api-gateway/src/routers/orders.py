@@ -19,6 +19,20 @@ async def list_orders(request: Request) -> Response:
     return await proxy_request(request, target_url)
 
 
+@router.get("/orders/statistics", tags=["Orders"])
+async def get_order_statistics(request: Request) -> Response:
+    """Get order statistics"""
+    target_url = f"{settings.order_service_url}/api/v1/orders/statistics"
+    return await proxy_request(request, target_url)
+
+
+@router.get("/orders/number/{order_number}", tags=["Orders"])
+async def get_order_by_number(request: Request, order_number: str) -> Response:
+    """Get order by order number"""
+    target_url = f"{settings.order_service_url}/api/v1/orders/number/{order_number}"
+    return await proxy_request(request, target_url)
+
+
 @router.get("/orders/{order_id}", tags=["Orders"])
 async def get_order(request: Request, order_id: int) -> Response:
     """Get order by ID"""

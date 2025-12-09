@@ -47,8 +47,10 @@ export const ENDPOINTS = {
   ORDERS: {
     LIST: '/api/v1/orders',
     BY_ID: (id) => `/api/v1/orders/${id}`,
+    BY_NUMBER: (orderNumber) => `/api/v1/orders/number/${orderNumber}`,
     STATUS: (id) => `/api/v1/orders/${id}/status`,
     PAYMENTS: (id) => `/api/v1/orders/${id}/payments`,
+    STATISTICS: '/api/v1/orders/statistics',
   },
 
   // Services/Catalog
