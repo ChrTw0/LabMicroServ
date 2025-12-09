@@ -22,15 +22,42 @@ const AdministradorGeneralDashboard = () => {
   const loadStatistics = async () => {
     setLoading(true);
     try {
-      // Cargar estadísticas de órdenes
+      // Obtener fecha de hoy para filtrar "today"
+      const today = new Date().toISOString().split('T')[0];
+
+      // Cargar estadísticas de órdenes (todas)
       const ordersStats = await orderService.getStatistics();
 
-      // Cargar estadísticas de facturación
+      // Cargar estadísticas de órdenes de hoy
+      const ordersTodayStats = await orderService.getStatistics({
+        date_from: today,
+        date_to: today
+      });
+
+      // Cargar estadísticas de facturación (todas)
       const billingStats = await billingService.getStatistics();
 
+      // Cargar estadísticas de facturación de hoy
+      const billingTodayStats = await billingService.getStatistics({
+        date_from: today,
+        date_to: today
+      });
+
+      // Transformar los datos del backend al formato esperado por el dashboard
       setStats({
-        orders: ordersStats || { total: 0, today: 0, registrada: 0, en_proceso: 0, completada: 0 },
-        billing: billingStats || { total: 0, today: 0, accepted: 0, pending: 0 },
+        orders: {
+          total: ordersStats?.total_orders || 0,
+          today: ordersTodayStats?.total_orders || 0,
+          registrada: ordersStats?.orders_by_status?.registrada || 0,
+          en_proceso: ordersStats?.orders_by_status?.en_proceso || 0,
+          completada: ordersStats?.orders_by_status?.completada || 0,
+        },
+        billing: {
+          total: parseFloat(billingStats?.total_billed || 0),
+          today: parseFloat(billingTodayStats?.total_billed || 0),
+          accepted: billingStats?.invoices_by_status?.ACEPTADO || 0,
+          pending: billingStats?.invoices_by_status?.PENDIENTE || 0,
+        },
       });
     } catch (err) {
       console.error('Error al cargar estadísticas:', err);

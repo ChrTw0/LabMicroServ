@@ -25,9 +25,15 @@ export const useReports = () => {
       setLoading(true);
       setError(null);
       const data = await reportService.getPaymentMethodReport(params);
-      // Asegurar que siempre sea un array
-      setPaymentMethodData(Array.isArray(data) ? data : []);
-      return { success: true, data };
+      // Asegurar que siempre sea un array y transformar valores numéricos
+      const normalizedData = Array.isArray(data) ? data.map(item => ({
+        ...item,
+        total_amount: parseFloat(item.total_amount) || 0,
+        count: parseInt(item.count) || 0,
+        percentage: parseFloat(item.percentage) || 0
+      })) : [];
+      setPaymentMethodData(normalizedData);
+      return { success: true, data: normalizedData };
     } catch (err) {
       const errorMessage = err.message || 'Error al cargar reporte de métodos de pago';
       setError(errorMessage);
@@ -47,11 +53,19 @@ export const useReports = () => {
       setLoading(true);
       setError(null);
       const data = await reportService.getTopServicesReport(params);
-      setTopServicesData(data);
-      return { success: true, data };
+      // Asegurar que siempre sea un array y transformar valores numéricos
+      const normalizedData = Array.isArray(data) ? data.map(item => ({
+        ...item,
+        quantity_sold: parseInt(item.quantity_sold) || 0,
+        total_revenue: parseFloat(item.total_revenue) || 0,
+        percentage: parseFloat(item.percentage) || 0
+      })) : [];
+      setTopServicesData(normalizedData);
+      return { success: true, data: normalizedData };
     } catch (err) {
       const errorMessage = err.message || 'Error al cargar reporte de servicios';
       setError(errorMessage);
+      setTopServicesData([]);
       console.error('Error fetching top services report:', err);
       return { success: false, error: errorMessage };
     } finally {
@@ -67,11 +81,18 @@ export const useReports = () => {
       setLoading(true);
       setError(null);
       const data = await reportService.getMonthlyRevenueReport(params);
-      setMonthlyRevenueData(data);
-      return { success: true, data };
+      // Asegurar que siempre sea un array y transformar valores numéricos
+      const normalizedData = Array.isArray(data) ? data.map(item => ({
+        ...item,
+        total_revenue: parseFloat(item.total_revenue) || 0,
+        total_orders: parseInt(item.total_orders) || 0
+      })) : [];
+      setMonthlyRevenueData(normalizedData);
+      return { success: true, data: normalizedData };
     } catch (err) {
       const errorMessage = err.message || 'Error al cargar reporte mensual';
       setError(errorMessage);
+      setMonthlyRevenueData([]);
       console.error('Error fetching monthly revenue report:', err);
       return { success: false, error: errorMessage };
     } finally {
@@ -107,11 +128,20 @@ export const useReports = () => {
       setLoading(true);
       setError(null);
       const data = await reportService.getSalesByPeriodReport(params);
-      setSalesByPeriodData(data);
-      return { success: true, data };
+      // Asegurar que siempre sea un array y transformar valores numéricos
+      const normalizedData = Array.isArray(data) ? data.map(item => ({
+        ...item,
+        total_sales: parseFloat(item.total_sales) || 0,
+        total_invoices: parseInt(item.total_invoices) || 0,
+        total_tax: parseFloat(item.total_tax) || 0,
+        avg_invoice_value: parseFloat(item.avg_invoice_value) || 0
+      })) : [];
+      setSalesByPeriodData(normalizedData);
+      return { success: true, data: normalizedData };
     } catch (err) {
       const errorMessage = err.message || 'Error al cargar reporte de ventas por periodo';
       setError(errorMessage);
+      setSalesByPeriodData([]);
       console.error('Error fetching sales by period report:', err);
       return { success: false, error: errorMessage };
     } finally {
@@ -127,11 +157,19 @@ export const useReports = () => {
       setLoading(true);
       setError(null);
       const data = await reportService.getInvoiceTypeReport(params);
-      setInvoiceTypeData(data);
-      return { success: true, data };
+      // Asegurar que siempre sea un array y transformar valores numéricos
+      const normalizedData = Array.isArray(data) ? data.map(item => ({
+        ...item,
+        total_amount: parseFloat(item.total_amount) || 0,
+        count: parseInt(item.count) || 0,
+        percentage: parseFloat(item.percentage) || 0
+      })) : [];
+      setInvoiceTypeData(normalizedData);
+      return { success: true, data: normalizedData };
     } catch (err) {
       const errorMessage = err.message || 'Error al cargar reporte por tipo de comprobante';
       setError(errorMessage);
+      setInvoiceTypeData([]);
       console.error('Error fetching invoice type report:', err);
       return { success: false, error: errorMessage };
     } finally {

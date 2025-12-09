@@ -52,6 +52,12 @@ const ReportsPage = () => {
   useEffect(() => {
     if (paymentMethodData.length > 0) {
       console.log('Payment Method Data:', paymentMethodData);
+      console.log('Data types:', paymentMethodData.map(item => ({
+        payment_method: typeof item.payment_method,
+        total_amount: typeof item.total_amount,
+        count: typeof item.count,
+        percentage: typeof item.percentage
+      })));
     }
   }, [paymentMethodData]);
 
@@ -326,7 +332,7 @@ const ReportsPage = () => {
                 </div>
               ) : Array.isArray(paymentMethodData) && paymentMethodData.length > 0 ? (
                 <>
-                  <ResponsiveContainer width="100%" height={300}>
+                  <ResponsiveContainer width="100%" height={350}>
                     <PieChart>
                       <Pie
                         data={paymentMethodData}
@@ -335,38 +341,25 @@ const ReportsPage = () => {
                         cx="50%"
                         cy="50%"
                         outerRadius={100}
+                        fill="#8884d8"
                         label={(entry) => `${entry.payment_method}: ${entry.percentage.toFixed(1)}%`}
+                        labelLine={true}
                       >
                         {paymentMethodData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value) => formatCurrency(value)} />
-                      <Legend />
+                      <Tooltip
+                        formatter={(value) => formatCurrency(value)}
+                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
+                      />
+                      <Legend
+                        verticalAlign="bottom"
+                        height={36}
+                        formatter={(value) => value}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
-                  <div className="stats-table">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Método de Pago</th>
-                          <th>Total</th>
-                          <th>Cantidad</th>
-                          <th>%</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {paymentMethodData.map((item, index) => (
-                          <tr key={index}>
-                            <td>{item.payment_method}</td>
-                            <td>{formatCurrency(item.total_amount)}</td>
-                            <td>{item.count}</td>
-                            <td>{item.percentage.toFixed(2)}%</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
                 </>
               ) : (
                 <p className="no-data">
@@ -531,9 +524,9 @@ const ReportsPage = () => {
             {/* Gráfico de tipos de comprobante - RF-075 */}
             <div className="report-card">
               <h3>Ventas por Tipo de Comprobante</h3>
-              {invoiceTypeData.length > 0 ? (
+              {Array.isArray(invoiceTypeData) && invoiceTypeData.length > 0 ? (
                 <>
-                  <ResponsiveContainer width="100%" height={250}>
+                  <ResponsiveContainer width="100%" height={350}>
                     <PieChart>
                       <Pie
                         data={invoiceTypeData}
@@ -541,39 +534,26 @@ const ReportsPage = () => {
                         nameKey="invoice_type"
                         cx="50%"
                         cy="50%"
-                        outerRadius={80}
+                        outerRadius={100}
+                        fill="#8884d8"
                         label={(entry) => `${entry.invoice_type}: ${entry.percentage.toFixed(1)}%`}
+                        labelLine={true}
                       >
                         {invoiceTypeData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value) => formatCurrency(value)} />
-                      <Legend />
+                      <Tooltip
+                        formatter={(value) => formatCurrency(value)}
+                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
+                      />
+                      <Legend
+                        verticalAlign="bottom"
+                        height={36}
+                        formatter={(value) => value}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
-                  <div className="stats-table">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Tipo</th>
-                          <th>Total</th>
-                          <th>Cantidad</th>
-                          <th>Promedio</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {invoiceTypeData.map((item, index) => (
-                          <tr key={index}>
-                            <td>{item.invoice_type}</td>
-                            <td>{formatCurrency(item.total_amount)}</td>
-                            <td>{item.count}</td>
-                            <td>{formatCurrency(item.avg_value)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
                 </>
               ) : (
                 <p className="no-data">No hay datos disponibles</p>

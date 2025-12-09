@@ -63,7 +63,7 @@ const OrderFormPage = () => {
       {
         service_id: service.id,
         service_name: service.name,
-        unit_price: parseFloat(service.price),
+        unit_price: parseFloat(service.current_price || service.price || 0),
         quantity: 1,
       },
     ]);
@@ -274,7 +274,7 @@ const OrderFormPage = () => {
                   <div className="service-info">
                     <strong>{service.name}</strong>
                     <span className="service-code">{service.code}</span>
-                    <span className="service-price">{formatCurrency(service.price)}</span>
+                    <span className="service-price">{formatCurrency(service.current_price || service.price || 0)}</span>
                   </div>
                   <button
                     type="button"
