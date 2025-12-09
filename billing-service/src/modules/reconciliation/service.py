@@ -263,16 +263,14 @@ class ReconciliationService:
 
         # Get invoices from local database
         from src.modules.billing.repository import InvoiceRepository
-        from src.modules.billing.models import InvoiceStatus
+        from src.modules.billing.models import InvoiceStatus, Invoice
         from sqlalchemy import select, func, and_
 
-        invoice_query = select(func.count()).select_from(
-            InvoiceRepository._get_base_query()
-        ).where(
+        invoice_query = select(func.count()).select_from(Invoice).where(
             and_(
-                InvoiceRepository.model.location_id == location_id,
-                func.date(InvoiceRepository.model.issue_date) == closure_date,
-                InvoiceRepository.model.invoice_status != InvoiceStatus.CANCELLED
+                Invoice.location_id == location_id,
+                func.date(Invoice.issue_date) == closure_date,
+                Invoice.invoice_status != InvoiceStatus.CANCELLED
             )
         )
         total_invoices = (await db.execute(invoice_query)).scalar() or 0
