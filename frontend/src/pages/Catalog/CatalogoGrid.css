@@ -1,0 +1,70 @@
+.catalogo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.service-card-grid {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.service-card-grid:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.service-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.service-card-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+.service-card-body {
+  flex-grow: 1;
+}
+
+.service-code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.8rem;
+  color: #95a5a6;
+  margin-bottom: 0.5rem;
+}
+
+.service-category {
+  font-weight: 500;
+  color: #3498db;
+  margin-bottom: 1rem;
+}
+
+.service-description {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.service-card-footer {
+  text-align: right;
+}
+
+.price-highlight {
+  color: #27ae60;
+  font-size: 1.4rem;
+  font-weight: 700;
+}

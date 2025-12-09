@@ -84,28 +84,26 @@ export const AppRouter = () => {
 
           {/* Catálogo de Servicios */}
           <Route path="catalog" element={<CatalogoPage />} />
-          <Route path="catalog/new" element={<CatalogoFormPage />} />
-          <Route path="catalog/:id/edit" element={<CatalogoFormPage />} />
+          <Route path="catalog/new" element={<PrivateRoute requiredPermissions={['catalog:write']}><CatalogoFormPage /></PrivateRoute>} />
+          <Route path="catalog/:id/edit" element={<PrivateRoute requiredPermissions={['catalog:write']}><CatalogoFormPage /></PrivateRoute>} />
           <Route path="catalog/:id/price-history" element={<PriceHistoryPage />} />
-          <Route path="catalog/categories" element={<CategoriesPage />} />
+          <Route path="catalog/categories" element={<PrivateRoute requiredPermissions={['catalog:write']}><CategoriesPage /></PrivateRoute>} />
 
           {/* Pacientes */}
-          {/* TODO: Proteger estas rutas con `hasPermission` */}
-          <Route path="patients" element={<PatientsListPage />} />
-          <Route path="patients/new" element={<PatientFormPage />} />
-          <Route path="patients/:id/edit" element={<PatientFormPage />} />
+          <Route path="patients" element={<PrivateRoute requiredPermissions={['patients:read']}><PatientsListPage /></PrivateRoute>} />
+          <Route path="patients/new" element={<PrivateRoute requiredPermissions={['patients:write']}><PatientFormPage /></PrivateRoute>} />
+          <Route path="patients/:id/edit" element={<PrivateRoute requiredPermissions={['patients:write']}><PatientFormPage /></PrivateRoute>} />
 
           {/* Órdenes */}
           <Route path="orders" element={<OrdersPageWrapper />} />
           <Route path="orders/new" element={<OrderFormPage />} />
           <Route path="orders/:id" element={<OrderDetailPage />} />
           <Route path="orders/:id/edit" element={<OrderFormPage />} />
-          <Route path="orders/:id/generate-invoice" element={<OrderGenerateInvoicePage />} /> {/* <-- 2. Añadir la nueva ruta */}
 
           {/* Facturación */}
-          <Route path="billing" element={<BillingListPage />} />
-          <Route path="billing/new" element={<InvoiceFormPage />} />
-          <Route path="billing/:id" element={<InvoiceDetailPage />} />
+          <Route path="billing" element={<PrivateRoute requiredPermissions={['billing:read']}><BillingListPage /></PrivateRoute>} />
+          <Route path="billing/new" element={<PrivateRoute requiredPermissions={['billing:write']}><InvoiceFormPage /></PrivateRoute>} />
+          <Route path="billing/:id" element={<PrivateRoute requiredPermissions={['billing:read']}><InvoiceDetailPage /></PrivateRoute>} />
 
           {/* Reportes - RF-074 a RF-082 */}
           <Route path="reports" element={<ReportsPage />} />

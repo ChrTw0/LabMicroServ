@@ -4,21 +4,26 @@
  */
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 import { useCatalog } from '../../hooks/useOrders';
+import CatalogoGrid from './CatalogoGrid';
 import './CatalogoPage.css';
 
 const CatalogoPage = () => {
   const navigate = useNavigate();
   const { services, categories, loading, error, fetchServices, fetchCategories } = useCatalog();
+  const { hasAnyRole } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState(''); // '', 'active', 'inactive'
 
+  const isReadOnly = hasAnyRole(['Recepcionista', 'Laboratorista', 'Contador', 'Paciente']);
+
   useEffect(() => {
-    fetchServices({ is_active: undefined }); // Cargar todos los servicios (activos e inactivos)
+    fetchServices({ is_active: isReadOnly ? true : undefined }); // Read-only roles only see active services
     fetchCategories();
-  }, []);
+  }, [isReadOnly]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -41,7 +46,7 @@ const CatalogoPage = () => {
     setSearchTerm('');
     setCategoryFilter('');
     setStatusFilter('');
-    fetchServices({ is_active: undefined });
+    fetchServices({ is_active: isReadOnly ? true : undefined });
   };
 
   const getCategoryName = (categoryId) => {
@@ -65,14 +70,16 @@ const CatalogoPage = () => {
     <div className="catalogo-page">
       <div className="page-header">
         <h1>Catálogo de Servicios</h1>
-        <div className="header-actions">
-          <Link to="/dashboard/catalog/categories" className="btn btn-outline">
-            📋 Gestionar Categorías
-          </Link>
-          <Link to="/dashboard/catalog/new" className="btn btn-primary">
-            + Nuevo Servicio
-          </Link>
-        </div>
+        {!isReadOnly && (
+          <div className="header-actions">
+            <Link to="/dashboard/catalog/categories" className="btn btn-outline">
+              📋 Gestionar Categorías
+            </Link>
+            <Link to="/dashboard/catalog/new" className="btn btn-primary">
+              + Nuevo Servicio
+            </Link>
+          </div>
+        )}
       </div>
 
       {error && (
@@ -104,15 +111,17 @@ const CatalogoPage = () => {
             ))}
           </select>
 
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="">Todos los estados</option>
-            <option value="active">Activos</option>
-            <option value="inactive">Inactivos</option>
-          </select>
+          {!isReadOnly && (
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">Todos los estados</option>
+              <option value="active">Activos</option>
+              <option value="inactive">Inactivos</option>
+            </select>
+          )}
 
           <button type="submit" className="btn btn-secondary">
             Buscar
@@ -135,75 +144,79 @@ const CatalogoPage = () => {
           Mostrando <strong>{services.length}</strong> servicios
         </p>
       </div>
-
-      <div className="table-container">
-        <table className="services-table">
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Nombre</th>
-              <th>Categoría</th>
-              <th>Precio Actual</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {services.length === 0 ? (
+      
+      {isReadOnly ? (
+        <CatalogoGrid services={services} categories={categories} />
+      ) : (
+        <div className="table-container">
+          <table className="services-table">
+            <thead>
               <tr>
-                <td colSpan="6" className="text-center">
-                  No se encontraron servicios
-                </td>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Precio Actual</th>
+                <th>Estado</th>
+                <th>Acciones</th>
               </tr>
-            ) : (
-              services.map((service) => (
-                <tr key={service.id}>
-                  <td>
-                    <strong>{service.id}</strong>
-                  </td>
-                  <td>{service.name}</td>
-                  <td>{getCategoryName(service.category_id)}</td>
-                  <td>
-                    <strong className="price-highlight">
-                      {formatCurrency(service.current_price || service.price)}
-                    </strong>
-                  </td>
-                  <td>
-                    <span className={`badge ${service.is_active ? 'badge-success' : 'badge-secondary'}`}>
-                      {service.is_active ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      <button
-                        onClick={() => navigate(`/dashboard/catalog/${service.id}`)}
-                        className="btn-icon btn-view"
-                        title="Ver detalles"
-                      >
-                        👁️
-                      </button>
-                      <button
-                        onClick={() => navigate(`/dashboard/catalog/${service.id}/edit`)}
-                        className="btn-icon btn-edit"
-                        title="Editar"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        onClick={() => navigate(`/dashboard/catalog/${service.id}/price-history`)}
-                        className="btn-icon btn-info"
-                        title="Historial de precios"
-                      >
-                        📊
-                      </button>
-                    </div>
+            </thead>
+            <tbody>
+              {services.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center">
+                    No se encontraron servicios
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                services.map((service) => (
+                  <tr key={service.id}>
+                    <td>
+                      <strong>{service.code}</strong>
+                    </td>
+                    <td>{service.name}</td>
+                    <td>{getCategoryName(service.category_id)}</td>
+                    <td>
+                      <strong className="price-highlight">
+                        {formatCurrency(service.current_price || service.price)}
+                      </strong>
+                    </td>
+                    <td>
+                      <span className={`badge ${service.is_active ? 'badge-success' : 'badge-secondary'}`}>
+                        {service.is_active ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="action-buttons">
+                        <button
+                          onClick={() => navigate(`/dashboard/catalog/${service.id}`)}
+                          className="btn-icon btn-view"
+                          title="Ver detalles"
+                        >
+                          👁️
+                        </button>
+                        <button
+                          onClick={() => navigate(`/dashboard/catalog/${service.id}/price-history`)}
+                          className="btn-icon btn-info"
+                          title="Historial de precios"
+                        >
+                          📊
+                        </button>
+                        <button
+                          onClick={() => navigate(`/dashboard/catalog/${service.id}/edit`)}
+                          className="btn-icon btn-edit"
+                          title="Editar"
+                        >
+                          ✏️
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {loading && (
         <div className="loading-overlay">
