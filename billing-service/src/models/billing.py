@@ -32,14 +32,27 @@ class Invoice(Base):
     invoice_number: Mapped[str] = mapped_column(String(20), unique=True, nullable=False, index=True)
     invoice_type: Mapped[InvoiceType] = mapped_column(SQLEnum(InvoiceType, native_enum=False), nullable=False)
     invoice_status: Mapped[InvoiceStatus] = mapped_column(SQLEnum(InvoiceStatus, native_enum=False), nullable=False, default=InvoiceStatus.DRAFT, index=True)
+    
     order_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     patient_id: Mapped[int] = mapped_column(Integer, nullable=False)
     location_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    
+    # Customer data snapshot
+    customer_document_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    customer_document_number: Mapped[str] = mapped_column(String(20), nullable=False)
+    customer_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    customer_address: Mapped[Optional[str]] = mapped_column(String(255))
+    
+    # Financial data
+    subtotal: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
+    tax: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     total: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
+    
     issue_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    
     items: Mapped[List["InvoiceItem"]] = relationship("InvoiceItem", back_populates="invoice", cascade="all, delete-orphan")
-    credit_note: Mapped["CreditNote"] = relationship("CreditNote", back_populates="invoice")
+    credit_note: Mapped[Optional["CreditNote"]] = relationship("CreditNote", back_populates="invoice")
 
 class InvoiceItem(Base):
     __tablename__ = "invoice_items"

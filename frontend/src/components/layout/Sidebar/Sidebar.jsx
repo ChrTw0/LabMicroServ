@@ -52,6 +52,7 @@ const Sidebar = () => {
       icon: '📈',
       label: 'Reportes',
       permissions: null, // Todos los usuarios pueden ver reportes
+      show: () => hasRole('Contador') || hasRole('Supervisor de Sede') || hasRole('Administrador General'),
     },
     {
       path: '/dashboard/reconciliation',

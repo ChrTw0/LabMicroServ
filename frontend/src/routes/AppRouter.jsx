@@ -12,12 +12,12 @@ import DashboardPage from '../pages/Dashboard/DashboardPage';
 import PatientsListPage from '../pages/Patients/PatientsListPage';
 import PatientFormPage from '../pages/Patients/PatientFormPage';
 import OrdersListPage from '../pages/Orders/OrdersListPage';
-import PatientOrdersListPage from '../pages/Orders/PatientOrdersListPage'; // Importar la nueva página
+import PatientOrdersListPage from '../pages/Orders/PatientOrdersListPage';
 import OrderFormPage from '../pages/Orders/OrderFormPage';
 import OrderDetailPage from '../pages/Orders/OrderDetailPage';
+import OrderGenerateInvoicePage from '../pages/Orders/OrderGenerateInvoicePage';
 import CatalogoPage from '../pages/Catalog/CatalogoPage';
 import CatalogoDetailPage from '../pages/Catalog/CatalogoDetailPage';
-import OrderGenerateInvoicePage from '../pages/Orders/OrderGenerateInvoicePage'; // <-- 1. Importar la nueva página
 import CatalogoFormPage from '../pages/Catalog/CatalogoFormPage';
 import CategoriesPage from '../pages/Catalog/CategoriesPage';
 import PriceHistoryPage from '../pages/Catalog/PriceHistoryPage';
@@ -37,8 +37,6 @@ import Layout from '../components/layout/Layout/Layout';
 // Wrapper para la página de Órdenes
 const OrdersPageWrapper = () => {
   const { hasRole } = useAuth();
-  // Si el usuario es un paciente, muestra su listado de órdenes.
-  // De lo contrario, muestra la gestión de órdenes para otros roles.
   return hasRole('Paciente') ? <PatientOrdersListPage /> : <OrdersListPage />;
 };
 
@@ -48,35 +46,29 @@ export const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Ruta pública: Catálogo (página de inicio) */}
         <Route
           path="/"
           element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <InicioPage />}
         />
 
-        {/* Ruta pública: Login */}
         <Route
           path="/login"
           element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />}
         />
 
-        {/* Rutas protegidas con Layout */}
         <Route
-          path="/dashboard" // Cambiamos el path base para que no entre en conflicto con la raíz pública
+          path="/dashboard"
           element={
             <PrivateRoute>
               <Layout />
             </PrivateRoute>
           }
         >
-          {/* Dashboard */}
-          {/* <Route index element={<DashboardPage />} /> */}
           <Route path="" element={<DashboardPage />} />
 
-          {/* Profile */}
           <Route path="profile" element={<ProfilePage />} />
 
-          {/* User Management */}
+          {/* Gestión de Usuarios y Roles (solo Administrador General) */}
           <Route path="usuarios" element={<PrivateRoute requiredRoles={['Administrador General']}><UsersListPage /></PrivateRoute>} />
           <Route path="usuarios/new" element={<PrivateRoute requiredRoles={['Administrador General']}><UserFormPage /></PrivateRoute>} />
           <Route path="usuarios/:id/edit" element={<PrivateRoute requiredRoles={['Administrador General']}><UserFormPage /></PrivateRoute>} />
@@ -84,35 +76,35 @@ export const AppRouter = () => {
           <Route path="roles/:id/edit" element={<PrivateRoute requiredRoles={['Administrador General']}><RoleFormPage /></PrivateRoute>} />
 
           {/* Catálogo de Servicios */}
-          <Route path="catalog" element={<CatalogoPage />} />
+          <Route path="catalog" element={<CatalogoPage />} /> {/* Vista principal del catálogo (mosaico/tabla) */}
           <Route path="catalog/new" element={<PrivateRoute requiredPermissions={['catalog:write']}><CatalogoFormPage /></PrivateRoute>} />
-          <Route path="catalog/:id" element={<CatalogoDetailPage />} />
+          <Route path="catalog/:id" element={<CatalogoDetailPage />} /> {/* Vista de detalle del servicio */}
           <Route path="catalog/:id/edit" element={<PrivateRoute requiredPermissions={['catalog:write']}><CatalogoFormPage /></PrivateRoute>} />
           <Route path="catalog/:id/price-history" element={<PriceHistoryPage />} />
           <Route path="catalog/categories" element={<PrivateRoute requiredPermissions={['catalog:write']}><CategoriesPage /></PrivateRoute>} />
 
-          {/* Pacientes */}
+          {/* Gestión de Pacientes (permisos de lectura/escritura) */}
           <Route path="patients" element={<PrivateRoute requiredPermissions={['patients:read']}><PatientsListPage /></PrivateRoute>} />
           <Route path="patients/new" element={<PrivateRoute requiredPermissions={['patients:write']}><PatientFormPage /></PrivateRoute>} />
           <Route path="patients/:id/edit" element={<PrivateRoute requiredPermissions={['patients:write']}><PatientFormPage /></PrivateRoute>} />
 
-          {/* Órdenes */}
-          <Route path="orders" element={<OrdersPageWrapper />} />
-          <Route path="orders/new" element={<OrderFormPage />} />
-          <Route path="orders/:id" element={<OrderDetailPage />} />
-          <Route path="orders/:id/edit" element={<OrderFormPage />} />
-          <Route path="orders/:id/generate-invoice" element={<OrderGenerateInvoicePage />} />
+          {/* Gestión de Órdenes (permisos de lectura/escritura) */}
+          <Route path="orders" element={<PrivateRoute requiredPermissions={['orders:read']}><OrdersPageWrapper /></PrivateRoute>} />
+          <Route path="orders/new" element={<PrivateRoute requiredPermissions={['orders:write']}><OrderFormPage /></PrivateRoute>} />
+          <Route path="orders/:id" element={<PrivateRoute requiredPermissions={['orders:read']}><OrderDetailPage /></PrivateRoute>} />
+          <Route path="orders/:id/edit" element={<PrivateRoute requiredPermissions={['orders:write']}><OrderFormPage /></PrivateRoute>} />
+          <Route path="orders/:id/generate-invoice" element={<PrivateRoute requiredPermissions={['billing:write']}><OrderGenerateInvoicePage /></PrivateRoute>} />
 
-          {/* Facturación */}
+          {/* Facturación (permisos de lectura/escritura) */}
           <Route path="billing" element={<PrivateRoute requiredPermissions={['billing:read']}><BillingListPage /></PrivateRoute>} />
           <Route path="billing/new" element={<PrivateRoute requiredPermissions={['billing:write']}><InvoiceFormPage /></PrivateRoute>} />
           <Route path="billing/:id" element={<PrivateRoute requiredPermissions={['billing:read']}><InvoiceDetailPage /></PrivateRoute>} />
 
-          {/* Reportes - RF-074 a RF-082 */}
-          <Route path="reports" element={<ReportsPage />} />
+          {/* Reportes (permisos de lectura) */}
+          <Route path="reports" element={<PrivateRoute requiredPermissions={['reports:read']}><ReportsPage /></PrivateRoute>} />
 
-          {/* Conciliación - RF-056 a RF-064 */}
-          <Route path="reconciliation" element={<PrivateRoute requiredRoles={['Contador', 'Supervisor de Sede', 'Administrador General']}><ReconciliationPage /></PrivateRoute>} />
+          {/* Conciliación (roles específicos) */}
+          <Route path="reconciliation" element={<PrivateRoute requiredRoles={['Contador', 'Administrador General']}><ReconciliationPage /></PrivateRoute>} />
 
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />
