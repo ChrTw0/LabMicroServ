@@ -9,3 +9,4 @@ export { default as billingService } from './billingService';
 export { default as api } from './api';
 export { default as profileService } from './profileService';
 export { default as userService } from './userService';
+export { default as roleService } from './roleService';

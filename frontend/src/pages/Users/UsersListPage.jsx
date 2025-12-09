@@ -75,9 +75,14 @@ const UsersListPage = () => {
     <div className="users-list-page">
       <div className="page-header">
         <h1>Gestión de Usuarios</h1>
-        <Link to="/dashboard/usuarios/new" className="btn btn-primary">
-          + Nuevo Usuario
-        </Link>
+        <div className="header-actions">
+          <Link to="/dashboard/roles" className="btn btn-outline">
+            Gestionar Roles
+          </Link>
+          <Link to="/dashboard/usuarios/new" className="btn btn-primary">
+            + Nuevo Usuario
+          </Link>
+        </div>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}

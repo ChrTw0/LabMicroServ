@@ -1,0 +1,15 @@
+AVAILABLE_PERMISSIONS = [
+    {"id": "all", "name": "Acceso Total"},
+    {"id": "patients:read", "name": "Ver Pacientes"},
+    {"id": "patients:write", "name": "Crear/Editar Pacientes"},
+    {"id": "orders:read", "name": "Ver Órdenes"},
+    {"id": "orders:write", "name": "Crear/Editar Órdenes"},
+    {"id": "billing:read", "name": "Ver Facturación"},
+    {"id": "billing:write", "name": "Crear/Editar Facturación"},
+    {"id": "reports:read", "name": "Ver Reportes"},
+    {"id": "reconciliation:read", "name": "Ver Conciliación"},
+    {"id": "reconciliation:write", "name": "Crear/Editar Conciliación"},
+    {"id": "lab:read", "name": "Ver Laboratorio"},
+    {"id": "lab:write", "name": "Crear/Editar Laboratorio"},
+    {"id": "results:read", "name": "Ver Resultados"},
+]

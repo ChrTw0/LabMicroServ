@@ -15,6 +15,13 @@ async def list_roles(request: Request) -> Response:
     return await proxy_request(request, target_url)
 
 
+@router.get("/available-permissions")
+async def get_available_permissions(request: Request) -> Response:
+    """List all available permissions"""
+    target_url = f"{settings.user_service_url}/api/v1/roles/available-permissions"
+    return await proxy_request(request, target_url)
+
+
 @router.get("/{role_id}")
 async def get_role(request: Request, role_id: int) -> Response:
     """Get role by ID"""

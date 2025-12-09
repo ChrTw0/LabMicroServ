@@ -22,7 +22,7 @@ import PriceHistoryPage from '../pages/Catalog/PriceHistoryPage';
 import BillingListPage from '../pages/Billing/BillingListPage';
 import InvoiceDetailPage from '../pages/Billing/InvoiceDetailPage';
 import InvoiceFormPage from '../pages/Billing/InvoiceFormPage';
-import { UsersListPage, UserFormPage } from '../pages/Users';
+import { UsersListPage, UserFormPage, RolesListPage, RoleFormPage } from '../pages/Users';
 import NotFoundPage from '../pages/NotFound/NotFoundPage';
 import InicioPage from '../pages/Inicio/InicioPage';
 import ProfilePage from '../pages/Profile/ProfilePage';
@@ -76,6 +76,8 @@ export const AppRouter = () => {
           <Route path="usuarios" element={<PrivateRoute requiredRoles={['Administrador General']}><UsersListPage /></PrivateRoute>} />
           <Route path="usuarios/new" element={<PrivateRoute requiredRoles={['Administrador General']}><UserFormPage /></PrivateRoute>} />
           <Route path="usuarios/:id/edit" element={<PrivateRoute requiredRoles={['Administrador General']}><UserFormPage /></PrivateRoute>} />
+          <Route path="roles" element={<PrivateRoute requiredRoles={['Administrador General']}><RolesListPage /></PrivateRoute>} />
+          <Route path="roles/:id/edit" element={<PrivateRoute requiredRoles={['Administrador General']}><RoleFormPage /></PrivateRoute>} />
 
           {/* Catálogo de Servicios */}
           <Route path="catalog" element={<CatalogoPage />} />

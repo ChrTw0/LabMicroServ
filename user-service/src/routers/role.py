@@ -9,6 +9,7 @@ from src.core.database import get_db
 from src.core.security import get_current_user_id, require_roles
 from src.services.role import RoleService
 from src.schemas.role import RoleCreate, RoleUpdate, RoleResponse, RoleWithUsersCount
+from src.core.permissions import AVAILABLE_PERMISSIONS
 
 router = APIRouter(prefix="/api/v1/roles", tags=["Roles"])
 
@@ -51,6 +52,18 @@ async def get_all_roles_with_count(
     - **active_only**: Si es True, solo devuelve roles activos
     """
     return await RoleService.get_all_roles_with_count(db, active_only)
+
+
+@router.get(
+    "/available-permissions",
+    summary="Listar todos los permisos disponibles",
+    dependencies=[Depends(require_roles("Administrador General"))]
+)
+async def get_all_available_permissions():
+    """
+    Obtener una lista de todos los permisos disponibles en el sistema.
+    """
+    return AVAILABLE_PERMISSIONS
 
 
 @router.get(
