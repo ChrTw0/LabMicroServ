@@ -1,7 +1,7 @@
-.catalogo-page {
+/* .catalogo-page {
   max-width: 1400px;
   margin: 0 auto;
-}
+} */
 
 .page-header {
   display: flex;
@@ -86,19 +86,19 @@
 }
 
 .services-table thead {
-  background-color: #ecf0f1;
+  background-color: #34495e;
+  color: white;
 }
 
 .services-table th {
   padding: 1rem;
   text-align: left;
   font-weight: 600;
-  color: #2c3e50;
-  border-bottom: 2px solid #ddd;
+  font-size: 0.9rem;
 }
 
 .services-table td {
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid #eee;
 }
 

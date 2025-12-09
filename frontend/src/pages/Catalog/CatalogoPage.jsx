@@ -83,52 +83,50 @@ const CatalogoPage = () => {
 
       <div className="filters-section">
         <form onSubmit={handleSearch} className="filters-form">
-          <div className="filter-row">
-            <input
-              type="text"
-              placeholder="Buscar por nombre o código..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="filter-input"
-            />
+          <input
+            type="text"
+            placeholder="Buscar por nombre o código..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="filter-input"
+          />
 
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="filter-select"
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="filter-select"
+          >
+            <option value="">Todas las categorías</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="filter-select"
+          >
+            <option value="">Todos los estados</option>
+            <option value="active">Activos</option>
+            <option value="inactive">Inactivos</option>
+          </select>
+
+          <button type="submit" className="btn btn-secondary">
+            Buscar
+          </button>
+
+          {(searchTerm || categoryFilter || statusFilter) && (
+            <button
+              type="button"
+              onClick={handleClearFilters}
+              className="btn btn-outline"
             >
-              <option value="">Todas las categorías</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="filter-select"
-            >
-              <option value="">Todos los estados</option>
-              <option value="active">Activos</option>
-              <option value="inactive">Inactivos</option>
-            </select>
-
-            <button type="submit" className="btn btn-secondary">
-              Buscar
+              Limpiar
             </button>
-
-            {(searchTerm || categoryFilter || statusFilter) && (
-              <button
-                type="button"
-                onClick={handleClearFilters}
-                className="btn btn-outline"
-              >
-                Limpiar
-              </button>
-            )}
-          </div>
+          )}
         </form>
       </div>
 
@@ -161,7 +159,7 @@ const CatalogoPage = () => {
               services.map((service) => (
                 <tr key={service.id}>
                   <td>
-                    <strong>{service.code}</strong>
+                    <strong>{service.id}</strong>
                   </td>
                   <td>{service.name}</td>
                   <td>{getCategoryName(service.category_id)}</td>

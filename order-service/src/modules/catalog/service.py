@@ -5,13 +5,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from typing import Optional, List, Dict
 from decimal import Decimal
+from loguru import logger
 
 from src.modules.catalog.models import Category, Service, PriceHistory
 from src.modules.catalog.repository import CategoryRepository, ServiceRepository, PriceHistoryRepository
 from src.modules.catalog.schemas import (
     CategoryCreate, CategoryUpdate, CategoryResponse, CategoryWithServicesCount,
     ServiceCreate, ServiceUpdate, ServiceResponse, ServiceListResponse,
-    UpdateServicePriceRequest, PriceHistoryResponse, ServiceDetailResponse
+    UpdateServicePriceRequest, PriceHistoryResponse, ServiceDetailResponse,
+    PriceHistoryListResponse
 )
 
 
@@ -169,12 +171,19 @@ class ServiceService:
         # Convert to response schema
         service_responses = []
         for service in services:
+            category_name = "Sin categoría"
+            if service.category:
+                category_name = service.category.name
+            else:
+                logger.warning(f"El servicio con ID {service.id} tiene una categoría inválida (category_id: {service.category_id})")
+
             service_dict = {
                 "id": service.id,
+                "code": service.code,
                 "name": service.name,
                 "description": service.description,
                 "category_id": service.category_id,
-                "category_name": service.category.name,
+                "category_name": category_name,
                 "current_price": service.current_price,
                 "is_active": service.is_active
             }
@@ -200,13 +209,20 @@ class ServiceService:
         # Get price history
         price_history = await PriceHistoryRepository.get_by_service_id(db, service_id, limit=10)
 
+        category_name = "Sin categoría"
+        if service.category:
+            category_name = service.category.name
+        else:
+            logger.warning(f"El servicio con ID {service.id} tiene una categoría inválida (category_id: {service.category_id})")
+
         # Convert to response schema
         service_dict = {
             "id": service.id,
+            "code": service.code,
             "name": service.name,
             "description": service.description,
             "category_id": service.category_id,
-            "category_name": service.category.name,
+            "category_name": category_name,
             "current_price": service.current_price,
             "is_active": service.is_active,
             "price_history": [PriceHistoryResponse.model_validate(ph) for ph in price_history]
@@ -228,15 +244,24 @@ class ServiceService:
             )
 
         # Check if service name already exists
-        existing = await ServiceRepository.get_by_name(db, data.name)
-        if existing:
+        existing_by_name = await ServiceRepository.get_by_name(db, data.name)
+        if existing_by_name:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Ya existe un servicio con el nombre '{data.name}'"
             )
+        
+        # Check if service code already exists
+        existing_by_code = await ServiceRepository.get_by_code(db, data.code)
+        if existing_by_code:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Ya existe un servicio con el código '{data.code}'"
+            )
 
         # Create service
         service = Service(
+            code=data.code,
             name=data.name,
             description=data.description,
             category_id=data.category_id,
@@ -245,13 +270,20 @@ class ServiceService:
         )
         service = await ServiceRepository.create(db, service)
 
+        category_name = "Sin categoría"
+        if service.category:
+            category_name = service.category.name
+        else:
+            logger.warning(f"El servicio con ID {service.id} tiene una categoría inválida (category_id: {service.category_id})")
+
         # Return response
         service_dict = {
             "id": service.id,
+            "code": service.code,
             "name": service.name,
             "description": service.description,
             "category_id": service.category_id,
-            "category_name": service.category.name,
+            "category_name": category_name,
             "current_price": service.current_price,
             "is_active": service.is_active
         }
@@ -282,32 +314,43 @@ class ServiceService:
 
         # Check if new name already exists
         if data.name and data.name != service.name:
-            existing = await ServiceRepository.get_by_name(db, data.name)
-            if existing:
+            existing_name = await ServiceRepository.get_by_name(db, data.name)
+            if existing_name:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=f"Ya existe un servicio con el nombre '{data.name}'"
                 )
+        
+        # Check if new code already exists
+        if data.code and data.code != service.code:
+            existing_code = await ServiceRepository.get_by_code(db, data.code)
+            if existing_code:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Ya existe un servicio con el código '{data.code}'"
+                )
 
         # Update fields
-        if data.name is not None:
-            service.name = data.name
-        if data.description is not None:
-            service.description = data.description
-        if data.category_id is not None:
-            service.category_id = data.category_id
-        if data.is_active is not None:
-            service.is_active = data.is_active
+        update_data = data.model_dump(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(service, key, value)
 
         service = await ServiceRepository.update(db, service)
+
+        category_name = "Sin categoría"
+        if service.category:
+            category_name = service.category.name
+        else:
+            logger.warning(f"El servicio con ID {service.id} tiene una categoría inválida (category_id: {service.category_id})")
 
         # Return response
         service_dict = {
             "id": service.id,
+            "code": service.code,
             "name": service.name,
             "description": service.description,
             "category_id": service.category_id,
-            "category_name": service.category.name,
+            "category_name": category_name,
             "current_price": service.current_price,
             "is_active": service.is_active
         }
@@ -346,17 +389,40 @@ class ServiceService:
         service.current_price = data.new_price
         service = await ServiceRepository.update(db, service)
 
+        category_name = "Sin categoría"
+        if service.category:
+            category_name = service.category.name
+        else:
+            logger.warning(f"El servicio con ID {service.id} tiene una categoría inválida (category_id: {service.category_id})")
+
         # Return response
         service_dict = {
             "id": service.id,
+            "code": service.code,
             "name": service.name,
             "description": service.description,
             "category_id": service.category_id,
-            "category_name": service.category.name,
+            "category_name": category_name,
             "current_price": service.current_price,
             "is_active": service.is_active
         }
         return ServiceResponse(**service_dict)
+
+    @staticmethod
+    async def get_price_history_by_service_id(db: AsyncSession, service_id: int) -> PriceHistoryListResponse:
+        """Get all price history for a service"""
+        # Check if service exists
+        service = await ServiceRepository.get_by_id(db, service_id)
+        if not service:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Servicio con ID {service_id} no encontrado"
+            )
+
+        history = await PriceHistoryRepository.get_all_history(db, service_id)
+        return PriceHistoryListResponse(
+            price_history=[PriceHistoryResponse.model_validate(h) for h in history]
+        )
 
     @staticmethod
     async def delete_service(db: AsyncSession, service_id: int) -> Dict[str, str]:
@@ -370,3 +436,4 @@ class ServiceService:
 
         await ServiceRepository.delete(db, service)
         return {"message": f"Servicio '{service.name}' desactivado exitosamente"}
+

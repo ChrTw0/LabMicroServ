@@ -43,6 +43,7 @@ class CategoryWithServicesCount(CategoryResponse):
 
 class ServiceBase(BaseModel):
     """Base service schema"""
+    code: str = Field(..., min_length=1, max_length=20, description="Código único del servicio")
     name: str = Field(..., min_length=1, max_length=255, description="Nombre del servicio/examen")
     description: Optional[str] = Field(None, description="Descripción del servicio")
     category_id: int = Field(..., gt=0, description="ID de la categoría")
@@ -66,6 +67,7 @@ class ServiceCreate(ServiceBase):
 
 class ServiceUpdate(BaseModel):
     """Schema for updating a service"""
+    code: Optional[str] = Field(None, min_length=1, max_length=20)
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     description: Optional[str] = None
     category_id: Optional[int] = Field(None, gt=0)
@@ -75,6 +77,7 @@ class ServiceUpdate(BaseModel):
 class ServiceResponse(BaseModel):
     """Schema for service response"""
     id: int
+    code: str
     name: str
     description: Optional[str]
     category_id: int
@@ -129,6 +132,11 @@ class ServiceListResponse(BaseModel):
     page: int = Field(..., description="Página actual")
     page_size: int = Field(..., description="Tamaño de página")
     services: List[ServiceResponse] = Field(..., description="Lista de servicios")
+
+
+class PriceHistoryListResponse(BaseModel):
+    """Schema for a list of price history records"""
+    price_history: List[PriceHistoryResponse]
 
 
 # ==================== Search/Filter Schemas ====================

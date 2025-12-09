@@ -11,7 +11,7 @@ from src.modules.catalog.service import CategoryService, ServiceService
 from src.modules.catalog.schemas import (
     CategoryCreate, CategoryUpdate, CategoryResponse, CategoryWithServicesCount,
     ServiceCreate, ServiceUpdate, ServiceResponse, ServiceListResponse,
-    ServiceDetailResponse, UpdateServicePriceRequest
+    ServiceDetailResponse, UpdateServicePriceRequest, PriceHistoryListResponse
 )
 
 # Note: Authentication will be added later when integrating with user-service
@@ -184,6 +184,21 @@ async def get_service_by_id(
     Incluye el historial de cambios de precio (últimos 10 cambios)
     """
     return await ServiceService.get_service_by_id(db, service_id)
+
+
+@service_router.get(
+    "/{service_id}/price-history",
+    response_model=PriceHistoryListResponse,
+    summary="Obtener historial de precios de un servicio"
+)
+async def get_price_history(
+    service_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Obtener el historial completo de cambios de precio para un servicio específico
+    """
+    return await ServiceService.get_price_history_by_service_id(db, service_id)
 
 
 @service_router.post(

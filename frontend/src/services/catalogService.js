@@ -54,7 +54,7 @@ const catalogService = {
    * @returns {Promise} - Servicio actualizado
    */
   async updatePrice(id, price) {
-    const response = await api.put(ENDPOINTS.SERVICES.PRICE(id), { price });
+    const response = await api.put(ENDPOINTS.SERVICES.PRICE(id), { new_price: price });
     return response.data;
   },
 

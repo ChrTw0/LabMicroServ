@@ -4,6 +4,21 @@
  */
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+
+/**
+ * Extrae el mensaje de error más relevante de un objeto de error.
+ * @param {any} error - El objeto de error capturado.
+ * @returns {string} El mensaje de error legible.
+ */
+const getErrorMessage = (error) => {
+  if (error && error.response && error.response.data) {
+    // Error de Axios con respuesta del backend
+    return error.response.data.detail || JSON.stringify(error.response.data);
+  }
+  // Error de JavaScript genérico u otro tipo
+  return error.message || 'Ocurrió un error inesperado.';
+};
+
 import { useCatalog } from '../../hooks/useOrders';
 import { catalogService } from '../../services';
 import './CatalogoFormPage.css';
@@ -47,6 +62,7 @@ const CatalogoFormPage = () => {
       });
     } catch (err) {
       alert(`Error al cargar servicio: ${err.message}`);
+      alert(`Error al cargar servicio: ${getErrorMessage(err)}`);
       navigate('/dashboard/catalog');
     } finally {
       setLoading(false);
@@ -65,7 +81,11 @@ const CatalogoFormPage = () => {
     e.preventDefault();
 
     // Validaciones
-    if (!formData.code || !formData.name || !formData.price) {
+    if (!isEditMode && !formData.code) {
+      alert('Por favor complete el código del servicio');
+      return;
+    }
+    if (!formData.name || !formData.price) {
       alert('Por favor complete todos los campos obligatorios');
       return;
     }
@@ -79,16 +99,14 @@ const CatalogoFormPage = () => {
     setLoading(true);
 
     try {
-      const serviceData = {
-        code: formData.code.trim(),
-        name: formData.name.trim(),
-        description: formData.description.trim() || null,
-        category_id: formData.category_id ? parseInt(formData.category_id) : null,
-        is_active: formData.is_active,
-      };
-
       if (isEditMode) {
-        // Actualizar servicio
+        // Actualizar servicio (sin el código)
+        const serviceData = {
+          name: formData.name.trim(),
+          description: String(formData.description).trim() || null,
+          category_id: formData.category_id ? parseInt(formData.category_id) : null,
+          is_active: formData.is_active,
+        };
         await catalogService.updateService(id, serviceData);
 
         // Si el precio cambió, actualizarlo también
@@ -103,8 +121,12 @@ const CatalogoFormPage = () => {
       } else {
         // Crear servicio nuevo
         const newServiceData = {
-          ...serviceData,
-          price: price,
+          code: formData.code.trim(),
+          name: formData.name.trim(),
+          description: String(formData.description).trim() || null,
+          category_id: formData.category_id ? parseInt(formData.category_id) : null,
+          is_active: formData.is_active,
+          current_price: price,
         };
         await catalogService.createService(newServiceData);
         alert('Servicio creado correctamente');
@@ -112,7 +134,7 @@ const CatalogoFormPage = () => {
 
       navigate('/dashboard/catalog');
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      alert(`Error: ${getErrorMessage(err)}`);
     } finally {
       setLoading(false);
     }
@@ -148,6 +170,7 @@ const CatalogoFormPage = () => {
                 value={formData.code}
                 onChange={handleChange}
                 placeholder="Ej: HEM001"
+                readOnly={isEditMode}
                 className="form-control"
                 required
               />

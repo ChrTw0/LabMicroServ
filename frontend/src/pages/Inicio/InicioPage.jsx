@@ -13,10 +13,10 @@ const InicioPage = () => {
   };
 
   return (
-    <div className="catalogo-page">
+    <div className="inicio-page">
       {/* TopNavBar */}
-      <header className="catalogo-header">
-        <div className="catalogo-header-content">
+      <header className="inicio-header">
+        <div className="inicio-header-content">
           <div className="logo-container">
             <div className="icon">🧪</div>
             <h2 className="title">Laboratorio Clínico</h2>
