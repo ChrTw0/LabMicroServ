@@ -43,6 +43,13 @@ async def delete_user(request: Request, user_id: int) -> Response:
     return await proxy_request(request, target_url)
 
 
+@router.put("/{user_id}/roles")
+async def assign_roles(request: Request, user_id: int) -> Response:
+    """Assign roles to a user"""
+    target_url = f"{settings.user_service_url}/api/v1/users/{user_id}/roles"
+    return await proxy_request(request, target_url)
+
+
 @router.put("/{user_id}/activate")
 async def activate_user(request: Request, user_id: int) -> Response:
     """Activate user"""

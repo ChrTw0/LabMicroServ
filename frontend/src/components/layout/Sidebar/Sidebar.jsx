@@ -7,7 +7,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import './Sidebar.css';
 
 const Sidebar = () => {
-  const { /* user, */ hasAnyPermission } = useAuth(); // Obtenemos también el usuario para ver sus permisos
+  const { hasAnyPermission, hasRole } = useAuth(); // Obtenemos también el usuario para ver sus permisos
 
   const menuItems = [
     {
@@ -20,7 +20,8 @@ const Sidebar = () => {
       path: '/dashboard/usuarios',
       icon: '🔑',
       label: 'Gestión de usuarios',
-      permissions: null, // Todos los usuarios (provisional)
+      permissions: null, // Oculto por defecto, se maneja con hasRole
+      show: () => hasRole('Administrador General'),
     },
     {
       path: '/dashboard/catalog',
@@ -52,15 +53,10 @@ const Sidebar = () => {
     <aside className="sidebar">
       <nav className="sidebar-nav">
         {menuItems.map((item) => {
-          // --- INICIO: Bloque de depuración ---
-/*           if (item.permissions) {
-            const userHasAccess = hasAnyPermission(item.permissions);
-            console.log(`[Sidebar] Verificando acceso para: "${item.label}"`);
-            console.log(`  - Permisos requeridos:`, item.permissions);
-            console.log(`  - Permisos del usuario:`, user);
-            console.log(`  - ¿Tiene acceso?: ${userHasAccess}`);
-          } */
-          // --- FIN: Bloque de depuración ---
+          // Si hay una función `show`, usarla para determinar la visibilidad
+          if (item.show && !item.show()) {
+            return null;
+          }
 
           // Si el item requiere permisos específicos, verificar
           if (item.permissions && !hasAnyPermission(item.permissions)) {

@@ -20,7 +20,7 @@ router = APIRouter(prefix="/api/v1/users", tags=["Users"])
     "",
     response_model=UserListResponse,
     summary="Listar todos los usuarios",
-    dependencies=[Depends(require_roles("Administrador General", "Supervisor de Sede"))]
+    dependencies=[Depends(require_roles("Administrador General"))]
 )
 async def get_all_users(
     page: int = Query(1, ge=1, description="Número de página"),
@@ -57,7 +57,7 @@ async def get_all_users(
     "/{user_id}",
     response_model=UserDetailResponse,
     summary="Obtener usuario por ID",
-    dependencies=[Depends(require_roles("Administrador General", "Supervisor de Sede"))]
+    dependencies=[Depends(require_roles("Administrador General"))]
 )
 async def get_user_by_id(
     user_id: int,

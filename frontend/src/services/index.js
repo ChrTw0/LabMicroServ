@@ -8,3 +8,4 @@ export { default as catalogService } from './catalogService';
 export { default as billingService } from './billingService';
 export { default as api } from './api';
 export { default as profileService } from './profileService';
+export { default as userService } from './userService';
