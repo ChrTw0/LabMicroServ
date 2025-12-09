@@ -213,32 +213,43 @@ const OrderFormPage = () => {
           <div className="form-card">
             <h2>1. Seleccionar Paciente</h2>
             <div className="form-group">
-              <label>Buscar Paciente:</label>
+              <label htmlFor="patient-search">Paciente: *</label>
               <input
+                id="patient-search"
                 type="text"
                 placeholder="Buscar por nombre, DNI o RUC..."
                 value={searchPatient}
-                onChange={(e) => setSearchPatient(e.target.value)}
+                onChange={(e) => {
+                  setSearchPatient(e.target.value);
+                  // Find the patient by name/document if a full match is entered
+                  const selectedPatient = filteredPatients.find(
+                    (p) =>
+                      (p.document_type === 'RUC'
+                        ? `${p.business_name} - ${p.document_number}`
+                        : `${p.first_name} ${p.last_name} - ${p.document_number}`) === e.target.value
+                  );
+                  if (selectedPatient) {
+                    setPatientId(selectedPatient.id.toString());
+                  } else {
+                    setPatientId(''); // Clear patientId if no exact match
+                  }
+                }}
                 className="form-control"
-              />
-            </div>
-            <div className="form-group">
-              <label>Paciente: *</label>
-              <select
-                value={patientId}
-                onChange={(e) => setPatientId(e.target.value)}
-                className="form-control"
+                list="patient-options"
                 required
-              >
-                <option value="">Seleccione un paciente</option>
+              />
+              <datalist id="patient-options">
                 {filteredPatients.map((patient) => (
-                  <option key={patient.id} value={patient.id}>
-                    {patient.document_type === 'RUC'
-                      ? `${patient.business_name} - ${patient.document_number}`
-                      : `${patient.first_name} ${patient.last_name} - ${patient.document_number}`}
-                  </option>
+                  <option
+                    key={patient.id}
+                    value={
+                      patient.document_type === 'RUC'
+                        ? `${patient.business_name} - ${patient.document_number}`
+                        : `${patient.first_name} ${patient.last_name} - ${patient.document_number}`
+                    }
+                  />
                 ))}
-              </select>
+              </datalist>
             </div>
             <div className="form-group">
               <label>Sede: *</label>

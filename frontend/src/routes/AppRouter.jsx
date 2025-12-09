@@ -16,6 +16,7 @@ import PatientOrdersListPage from '../pages/Orders/PatientOrdersListPage'; // Im
 import OrderFormPage from '../pages/Orders/OrderFormPage';
 import OrderDetailPage from '../pages/Orders/OrderDetailPage';
 import CatalogoPage from '../pages/Catalog/CatalogoPage';
+import CatalogoDetailPage from '../pages/Catalog/CatalogoDetailPage';
 import CatalogoFormPage from '../pages/Catalog/CatalogoFormPage';
 import CategoriesPage from '../pages/Catalog/CategoriesPage';
 import PriceHistoryPage from '../pages/Catalog/PriceHistoryPage';
@@ -84,6 +85,7 @@ export const AppRouter = () => {
           {/* Catálogo de Servicios */}
           <Route path="catalog" element={<CatalogoPage />} />
           <Route path="catalog/new" element={<PrivateRoute requiredPermissions={['catalog:write']}><CatalogoFormPage /></PrivateRoute>} />
+          <Route path="catalog/:id" element={<CatalogoDetailPage />} />
           <Route path="catalog/:id/edit" element={<PrivateRoute requiredPermissions={['catalog:write']}><CatalogoFormPage /></PrivateRoute>} />
           <Route path="catalog/:id/price-history" element={<PriceHistoryPage />} />
           <Route path="catalog/categories" element={<PrivateRoute requiredPermissions={['catalog:write']}><CategoriesPage /></PrivateRoute>} />
