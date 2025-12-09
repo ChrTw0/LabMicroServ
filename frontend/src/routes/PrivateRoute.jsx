@@ -1,12 +1,12 @@
 /**
  * PrivateRoute Component
- * HOC para proteger rutas que requieren autenticación
+ * HOC para proteger rutas que requieren autenticación y permisos/roles específicos
  */
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
-export const PrivateRoute = ({ children, requiredRoles = null }) => {
-  const { isAuthenticated, loading, hasAnyRole } = useAuth();
+export const PrivateRoute = ({ children, requiredRoles = null, requiredPermissions = null }) => {
+  const { isAuthenticated, loading, hasAnyRole, hasAnyPermission } = useAuth();
 
   // Mostrar loading mientras se verifica la autenticación
   if (loading) {
@@ -27,11 +27,21 @@ export const PrivateRoute = ({ children, requiredRoles = null }) => {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
         <h2>Acceso Denegado</h2>
-        <p>No tienes permisos para acceder a esta página.</p>
+        <p>No tienes los roles necesarios para acceder a esta página.</p>
       </div>
     );
   }
 
-  // Usuario autenticado y con permisos correctos
+  // Si se requieren permisos específicos, verificar
+  if (requiredPermissions && !hasAnyPermission(requiredPermissions)) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <h2>Acceso Denegado</h2>
+        <p>No tienes los permisos necesarios para acceder a esta página.</p>
+      </div>
+    );
+  }
+
+  // Usuario autenticado y con permisos/roles correctos
   return children;
 };
