@@ -140,3 +140,39 @@ class OrderStats(BaseModel):
     total_orders: int = Field(..., description="Total de órdenes")
     orders_by_status: dict = Field(..., description="Órdenes por estado")
     total_revenue: Decimal = Field(..., description="Ingresos totales")
+
+
+# ==================== Advanced Reporting Schemas ====================
+
+class PaymentMethodStats(BaseModel):
+    """Statistics by payment method - RF-077"""
+    payment_method: str = Field(..., description="Método de pago")
+    total_amount: Decimal = Field(..., description="Monto total")
+    count: int = Field(..., description="Cantidad de transacciones")
+    percentage: float = Field(..., description="Porcentaje del total")
+
+
+class ServiceStats(BaseModel):
+    """Most requested services statistics - RF-076"""
+    service_id: int = Field(..., description="ID del servicio")
+    service_name: str = Field(..., description="Nombre del servicio")
+    quantity_sold: int = Field(..., description="Cantidad vendida")
+    total_revenue: Decimal = Field(..., description="Ingresos generados")
+    percentage: float = Field(..., description="Porcentaje de participación")
+
+
+class MonthlyRevenueStats(BaseModel):
+    """Monthly revenue comparison - RF-079"""
+    month: str = Field(..., description="Mes (YYYY-MM)")
+    total_revenue: Decimal = Field(..., description="Ingresos del mes")
+    total_orders: int = Field(..., description="Órdenes del mes")
+    avg_order_value: Decimal = Field(..., description="Valor promedio de orden")
+
+
+class PatientTypeStats(BaseModel):
+    """New vs recurring patients statistics - RF-078"""
+    new_patients: int = Field(..., description="Pacientes nuevos")
+    recurring_patients: int = Field(..., description="Pacientes recurrentes")
+    total_patients: int = Field(..., description="Total de pacientes")
+    new_percentage: float = Field(..., description="Porcentaje nuevos")
+    recurring_percentage: float = Field(..., description="Porcentaje recurrentes")
