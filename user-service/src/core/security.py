@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import HTTPException, status, Depends
+from fastapi import HTTPException, status, Depends, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from loguru import logger
 
@@ -139,3 +139,14 @@ def require_roles(*required_roles: str):
         return payload
 
     return role_checker
+
+
+def verify_internal_api_key(x_internal_api_key: str = Header(...)):
+    """
+    Dependency to verify the internal API key for service-to-service communication.
+    """
+    if x_internal_api_key != settings.internal_api_key:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid internal API key"
+        )

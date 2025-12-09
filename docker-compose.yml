@@ -140,6 +140,7 @@ services:
     container_name: labmic_patient_service
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:1234@patient-db:5432/patient_db
+      - USER_SERVICE_URL=http://user-service:8001
       - SECRET_KEY=your-secret-key-change-this-in-production
       - ENVIRONMENT=development
       - SERVICE_NAME=patient-service

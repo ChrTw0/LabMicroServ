@@ -149,7 +149,7 @@ const PatientsListPage = () => {
                   <td>
                     <div className="action-buttons">
                       <button
-                        onClick={() => navigate(`/patients/${patient.id}/edit`)}
+                        onClick={() => navigate(`/dashboard/patients/${patient.id}/edit`)}
                         className="btn-icon btn-edit"
                         title="Editar"
                       >
