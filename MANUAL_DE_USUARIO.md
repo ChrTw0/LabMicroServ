@@ -135,7 +135,20 @@ Este módulo permite cuadrar las operaciones financieras del día.
 6.  **Completar Orden:** Una vez finalizados los análisis, el laboratorista cambia el estado de la orden a "Completada".
 7.  **Consulta de Resultados:** El paciente puede ingresar al sistema con su usuario y contraseña para ver el historial y los resultados de sus órdenes.
 
-## 6. Preguntas Frecuentes (FAQ)
+## 7. Credenciales de Acceso por Defecto
+
+A continuación, se listan las credenciales de los usuarios predefinidos en el sistema. Utilice estas credenciales para probar las diferentes funcionalidades y roles.
+
+| Rol                   | Email                      | Contraseña         |
+| :-------------------- | :------------------------- | :----------------- |
+| Administrador General | `admin@labclinico.com`     | `Admin123`         |
+| Recepcionista         | `recepcionista@labclinico.com` | `Recepcionista123` |
+| Supervisor de Sede    | `supervisor@labclinico.com` | `Supervisor123`    |
+| Laboratorista         | `laboratorista@labclinico.com` | `Laboratorista123` |
+| Contador              | `contador@labclinico.com`  | `Contador123`      |
+| Paciente              | `paciente@labclinico.com`  | `Paciente123`      |
+
+## 8. Preguntas Frecuentes (FAQ)
 
 **P: ¿Qué hago si olvidé mi contraseña?**
 **R:** En la página de inicio de sesión, haga clic en el enlace "¿Olvidó su contraseña?" y siga las instrucciones para restablecerla a través de su correo electrónico.
