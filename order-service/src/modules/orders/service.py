@@ -143,29 +143,53 @@ class OrderService:
                 "subtotal": subtotal
             })
 
-        # Generate order number
-        order_number = await OrderRepository.generate_order_number(db)
+        # Retry logic for order number generation and creation
+        for attempt in range(5):
+            try:
+                # Generate order number
+                order_number = await OrderRepository.generate_order_number(db)
 
-        # Create order
-        order = Order(
-            order_number=order_number,
-            patient_id=data.patient_id,
-            location_id=data.location_id,
-            status=OrderStatus.REGISTRADA,
-            total=total
+                # Create order
+                order = Order(
+                    order_number=order_number,
+                    patient_id=data.patient_id,
+                    location_id=data.location_id,
+                    status=OrderStatus.REGISTRADA,
+                    total=total
+                )
+                order = await OrderRepository.create(db, order)
+
+                # Create order items
+                order_items = [
+                    OrderItem(order_id=order.id, **item_data)
+                    for item_data in items_data
+                ]
+                await OrderItemRepository.create_many(db, order_items)
+                await db.commit()
+
+                # Reload order with details
+                return await OrderService.get_order_by_id(db, order.id)
+
+            except IntegrityError as e:
+                await db.rollback() # Rollback the current transaction
+                # Check if the error is specifically a unique constraint violation on order_number
+                # The 'DETAIL' part of the error message is specific to PostgreSQL
+                if "duplicate key value violates unique constraint" in str(e) and "ix_orders_order_number" in str(e):
+                    if attempt < 4:  # If not the last attempt, retry
+                        continue
+                    else: # Last attempt, raise error
+                        raise HTTPException(
+                            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="No se pudo generar un número de orden único después de varios intentos."
+                        )
+                else: # Other IntegrityError, re-raise
+                    raise
+        
+        # This part should be unreachable unless there's an unexpected error not caught by IntegrityError
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error inesperado al crear la orden."
         )
-        order = await OrderRepository.create(db, order)
-
-        # Create order items
-        order_items = [
-            OrderItem(order_id=order.id, **item_data)
-            for item_data in items_data
-        ]
-        await OrderItemRepository.create_many(db, order_items)
-        await db.commit()
-
-        # Reload order with details
-        return await OrderService.get_order_by_id(db, order.id)
 
     @staticmethod
     async def update_order(
