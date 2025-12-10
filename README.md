@@ -19,7 +19,7 @@ Sistema de gestión integral para laboratorio clínico basado en arquitectura de
 
 ## 🏗️ Arquitectura
 
-El sistema está compuesto por 6 microservicios independientes + API Gateway:
+El sistema está compuesto por 5 microservicios independientes + API Gateway:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -36,13 +36,13 @@ El sistema está compuesto por 6 microservicios independientes + API Gateway:
          │                    │                    │
          └────────────────────┼────────────────────┘
                               │
-         ┌────────────────────┼────────────────────┐
-         │                    │                    │
-┌────────▼────────┐  ┌───────▼────────┐  ┌───────▼────────┐
-│ Billing Service │  │  Config Service │  │Reporting Service│
-│   (Port 8004)   │  │   (Port 8005)   │  │  (Port 8006)   │
-│   billing_db    │  │    config_db    │  │   (Analytics)  │
-└─────────────────┘  └─────────────────┘  └────────────────┘
+         ┌────────────────────┼─
+         │                    │                   
+┌────────▼────────┐  ┌───────▼────────┐  
+│ Billing Service │  │  Config Service │  
+│   (Port 8004)   │  │   (Port 8005)   │  
+│   billing_db    │  │    config_db    │  
+└─────────────────┘  └─────────────────┘  
 ```
 
 ## 🛠️ Tecnologías
@@ -315,14 +315,6 @@ LabMicroServ/
 
 **Base de datos:** `config_db` (5 tablas)
 
-### 6. Reporting Service (Port 8006) 🔧
-**Estado:** Pendiente implementación
-
-**Funcionalidades pendientes:**
-- Dashboard y KPIs
-- Reportes operativos
-- Data Warehouse
-- Exportación a Excel/PDF
 
 ### 7. API Gateway (Port 8000) 🔧
 **Estado:** Configurado, pendiente routing
