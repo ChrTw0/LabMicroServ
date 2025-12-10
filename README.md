@@ -57,142 +57,9 @@ El sistema está compuesto por 6 microservicios independientes + API Gateway:
 - **Validation:** Pydantic 2.5+
 - **Testing:** Pytest
 
-## 📦 Requisitos Previos
-
-- **Docker** >= 20.10
-- **Docker Compose** >= 2.0
-- **Python** >= 3.11 (para desarrollo local sin Docker)
-- **Git**
-
-## 🚀 Instalación y Setup
-
-### 1. Clonar el repositorio
-
-```bash
-git clone https://github.com/ChrTw0/LabMicroServ.git
-cd LabMicroServ
-```
-
-### 2. Configurar variables de entorno
-
-Cada servicio tiene su archivo `.env`. Las configuraciones por defecto funcionan para desarrollo local:
-
-```bash
-# Revisar archivos .env en cada servicio
-ls *-service/.env
-
-# Los valores por defecto ya están configurados para:
-# - Bases de datos PostgreSQL en Docker
-# - Credenciales SUNAT Beta (pruebas)
-# - Puertos estándar (8001-8006, 8000)
-```
-
-**⚠️ IMPORTANTE para PRODUCCIÓN:**
-- Cambiar todas las contraseñas de bases de datos
-- Configurar certificado digital SUNAT real
-- Actualizar SECRET_KEY en cada servicio
-- Configurar SMTP real para notificaciones
-
-### 3. Levantar los servicios con Docker Compose
-
-```bash
-# Levantar todos los servicios (bases de datos + microservicios)
-docker-compose up -d
-
-# Ver logs
-docker-compose logs -f
-
-# Ver logs de un servicio específico
-docker-compose logs -f billing-service
-
-# Ver estado de contenedores
-docker-compose ps
-```
-
-### 4. Instalar dependencias (si hay nuevas)
-
-```bash
-# Si agregaste nuevas dependencias, reinstalar en cada servicio
-docker exec labmic_billing_service pip install -r requirements.txt
-docker exec labmic_user_service pip install -r requirements.txt
-# etc.
-```
-
-### 5. Ejecutar migraciones de base de datos
-
-```bash
-# User Service
-docker exec labmic_user_service alembic upgrade head
-
-# Patient Service
-docker exec labmic_patient_service alembic upgrade head
-
-# Order Service
-docker exec labmic_order_service alembic upgrade head
-
-# Billing Service
-docker exec labmic_billing_service alembic upgrade head
-
-# Configuration Service
-docker exec labmic_configuration_service alembic upgrade head
-```
-
-### 6. Poblar datos iniciales (Seed)
-
-```bash
-# Datos de usuarios y roles
-docker exec labmic_user_service python seed_data.py
-
-# Datos de pacientes de prueba
-docker exec labmic_patient_service python seed_data.py
-
-# Catálogo de servicios y órdenes de prueba
-docker exec labmic_order_service python seed_data.py
-
-# Facturas y boletas de prueba (incluye service_code)
-docker exec labmic_billing_service python seed_data.py
-
-# Configuración de empresa y sedes
-docker exec labmic_configuration_service python seed_data.py
-```
-
-### Credenciales de Usuario por Defecto:
-
-⚠️ **IMPORTANTE:** Cambia las contraseñas de todos los usuarios después del primer login, especialmente la del administrador.
-
-| Rol                   | Email                      | Contraseña         |
-| :-------------------- | :------------------------- | :----------------- |
-| Administrador General | `admin@labclinico.com`     | `Admin123`         |
-| Recepcionista         | `recepcionista@labclinico.com` | `Recepcionista123` |
-| Supervisor de Sede    | `supervisor@labclinico.com` | `Supervisor123`    |
-| Laboratorista         | `laboratorista@labclinico.com` | `Laboratorista123` |
-| Contador              | `contador@labclinico.com`  | `Contador123`      |
-| Paciente              | `paciente@labclinico.com`  | `Paciente123`      |
-
-### 7. Verificar que los servicios estén corriendo
-
-```bash
-# Health checks
-curl http://localhost:8001/health  # User Service
-curl http://localhost:8002/health  # Patient Service
-curl http://localhost:8003/health  # Order Service
-curl http://localhost:8004/health  # Billing Service
-curl http://localhost:8005/health  # Configuration Service
-curl http://localhost:8000/health  # API Gateway
-```
-
-### 8. Acceder a la documentación API (Swagger UI)
-
-- **User Service:** http://localhost:8001/docs
-- **Patient Service:** http://localhost:8002/docs
-- **Order Service:** http://localhost:8003/docs
-- **Billing Service:** http://localhost:8004/docs
-- **Configuration Service:** http://localhost:8005/docs
-- **API Gateway:** http://localhost:8000/docs
-
 ## 🚦 Estado del Proyecto
 
-**Sprint Actual:** Sprint 1 (18 nov - 24 nov)
+**Sprint Actual:** Sprint 4
 
 ### ✅ Completado
 
@@ -223,41 +90,38 @@ curl http://localhost:8000/health  # API Gateway
 - ✅ 8 endpoints REST documentados
 - ✅ Seed data: 4 roles + usuario admin
 
+
 **Roles disponibles:**
 1. Administrador General (acceso completo)
 2. Recepcionista (pacientes, órdenes, facturación)
 3. Supervisor de Sede (reportes, conciliación)
 4. Laboratorista (resultados de lab)
 
-### 🔄 En Progreso
-- ⏳ F-02: Gestión de roles y permisos
-
-### 📋 Pendiente (Sprint 1)
-- ⏸️ F-08: Gestión del catálogo
-- ⏸️ F-09: Visualización y búsqueda de servicios
-- ⏸️ F-10: Gestión económica del catálogo
-- ⏸️ F-11: Creación y gestión de órdenes
-- ⏸️ F-12: Control económico de órdenes
-- ⏸️ F-13: Control administrativo de órdenes
-- ⏸️ F-27: Reportes operativos
+- ✅ F-08: Gestión del catálogo
+- ✅ F-09: Visualización y búsqueda de servicios
+- ✅ F-10: Gestión económica del catálogo
+- ✅ F-11: Creación y gestión de órdenes
+- ✅ F-12: Control económico de órdenes
+- ✅ F-13: Control administrativo de órdenes
+- ✅ F-27: Reportes operativos
 - 
 ### 📋 Sprint 2
 
-- ⏸️ F-03:Gestión del perfil de usuario
-- ⏸️ F-04:Registro y mantenimiento de pacientes
-- ⏸️ F-31:Parámetros fiscales y técnicos
-- ⏸️ F-16:Gestión documental de comprobantes
+- ✅ F-03:Gestión del perfil de usuario
+- ✅ F-04:Registro y mantenimiento de pacientes
+- ✅ F-31:Parámetros fiscales y técnicos
+- ✅ F-16:Gestión documental de comprobantes
 
 ### 📋 Sprint 3
 
-- ⏸️ F-06:Consulta e historial clínico
-- ⏸️ F-23:Gestión de discrepancias
-- ⏸️ F-22:Reportes financieros
-- ⏸️ F-20:Monitoreo y reenvío de notificaciones
-- ⏸️ F-21:Conciliación automática diaria
-- ⏸️ F-24:Sincronización automática
-- ⏸️ F-26:Visualización de KPIs
-- ⏸️ F-19:Alertas operativas
+- ✅ F-06:Consulta e historial clínico
+- ✅ F-23:Gestión de discrepancias
+- ✅ F-22:Reportes financieros
+- ✅ F-20:Monitoreo y reenvío de notificaciones
+- ✅ F-21:Conciliación automática diaria
+- ✅ F-24:Sincronización automática
+- ✅ F-26:Visualización de KPIs
+- ✅ F-19:Alertas operativas
 
 ### 📋 Sprint 4
 
@@ -487,138 +351,6 @@ Password: 1234
 
 **⚠️ CAMBIAR EN PRODUCCIÓN**
 
-## 🔐 Autenticación
-
-### Login
-
-```bash
-POST http://localhost:8001/api/v1/auth/login
-Content-Type: application/json
-
-{
-  "email": "admin@labclinico.com",
-  "password": "Admin123"
-}
-```
-
-**Respuesta:**
-```json
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "bearer",
-  "user": {
-    "id": 1,
-    "email": "admin@labclinico.com",
-    "first_name": "Admin",
-    "last_name": "Sistema",
-    "roles": ["Administrador General"],
-    "is_active": true
-  }
-}
-```
-
-### Usar el token en requests
-
-```bash
-Authorization: Bearer <access_token>
-```
-
-En Swagger UI:
-1. Click en "Authorize" 🔒
-2. Pegar: `Bearer <tu_token>`
-3. Click "Authorize"
-
-## 💻 Desarrollo
-
-### Desarrollo local (sin Docker)
-
-```bash
-# 1. Crear entorno virtual
-cd user-service
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# 2. Instalar dependencias
-pip install -r requirements.txt
-
-# 3. Configurar .env
-# Ajustar DATABASE_URL a localhost en lugar del nombre del contenedor
-
-# 4. Ejecutar migraciones
-alembic upgrade head
-
-# 5. Iniciar servicio
-uvicorn src.main:app --reload --port 8001
-```
-
-### Migraciones con Alembic
-
-```bash
-# Crear nueva migración
-docker-compose exec user-service alembic revision --autogenerate -m "descripcion"
-
-# Aplicar migraciones
-docker-compose exec user-service alembic upgrade head
-
-# Revertir última migración
-docker-compose exec user-service alembic downgrade -1
-
-# Ver historial
-docker-compose exec user-service alembic history
-```
-
-### Comandos útiles de Docker
-
-```bash
-# Detener servicios
-docker-compose down
-
-# Detener y eliminar volúmenes (⚠️ ELIMINA DATOS)
-docker-compose down -v
-
-# Reconstruir un servicio específico
-docker-compose build user-service
-
-# Reiniciar un servicio
-docker-compose restart user-service
-
-# Ver logs en tiempo real
-docker-compose logs -f --tail=100 user-service
-
-# Ejecutar comando en contenedor
-docker-compose exec user-service bash
-
-# Ver estado de servicios
-docker-compose ps
-```
-
-## 🧪 Testing
-
-```bash
-# Ejecutar tests de un servicio
-cd user-service
-pytest
-
-# Con cobertura
-pytest --cov=src --cov-report=html
-
-# Tests específicos
-pytest tests/test_auth.py -v
-```
-
-## 📚 Documentación
-
-- **[Arquitectura de Microservicios](docs/ARQUITECTURA_MICROSERVICIOS.md)** - Diseño detallado
-- **[Modelos SQLAlchemy](docs/MODELOS_SQLALCHEMY.md)** - Esquemas de BD
-- **[Requerimientos](Requirements.md)** - Especificaciones funcionales
-- **[Sprint 1](Sprint1.md)** - Planning del sprint actual
-- **[Historias de Usuario](historias.md)** - User stories completas
-
-### Sesiones de Desarrollo
-- **[Sesión 2](sesion2.md)** - Configuración inicial y estructura base
-- **[Sesión 3](sesion3.md)** - API Gateway, RBAC y dashboards por rol
-- **[Sesión 4](sesion4.md)** - **Integración SUNAT** (UBL 2.1, firma digital, SOAP client)
-
 ## 🔒 Seguridad
 
 - ✅ Contraseñas hasheadas con bcrypt
@@ -630,38 +362,6 @@ pytest tests/test_auth.py -v
 - ⏳ Rate limiting en API Gateway
 - ⏳ Refresh tokens
 
-## 📝 TODO List
-
-### Inmediato (Sprint 1)
-- [ ] F-02: Implementar gestión de roles y permisos
-- [ ] F-08: Implementar catálogo de servicios
-- [ ] F-09: Búsqueda y visualización de servicios
-- [ ] F-10: Gestión económica del catálogo
-- [ ] F-11: Creación y gestión de órdenes
-- [ ] F-12: Control económico de órdenes
-- [ ] F-13: Control administrativo de órdenes
-- [ ] F-27: Reportes operativos básicos
-
-### Mejoras técnicas
-- [ ] Implementar refresh tokens
-- [ ] Agregar tests unitarios y de integración
-- [ ] Configurar CI/CD
-- [ ] Agregar logging estructurado
-- [ ] Implementar health checks avanzados
-- [ ] Configurar Prometheus + Grafana para monitoreo
-- [ ] Agregar rate limiting
-- [ ] Implementar caché con Redis
-
-### Futuro (Sprints 2-4)
-- [ ] Gestión de pacientes completa
-- [ ] Integración con laboratorio (LIS)
-- [x] **Facturación electrónica SUNAT** ✅ (Completado en Sesión 4)
-- [ ] Notificaciones (Email, WhatsApp)
-- [ ] Sistema de backup automático
-- [ ] Dashboard analítico
-- [ ] Exportación de reportes
-- [ ] Frontend de facturación (módulo visual)
-
 ## 👥 Equipo
 
 - **William** - User Service (Auth, Roles)
@@ -670,12 +370,3 @@ pytest tests/test_auth.py -v
 - **Eduard** - Order Service
 - **Christian** - Order Economic/Admin Controls
 - **Cristian** - Reporting Service
-
-## 📄 Licencia
-
-Este proyecto es privado y confidencial.
-
----
-
-**Última actualización:** 8 de diciembre de 2025
-**Versión:** 0.2.0 (Sprint 1 - Integración SUNAT completada)

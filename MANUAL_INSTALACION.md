@@ -121,3 +121,32 @@ Después de poblar los datos, puede acceder a la aplicación con las siguientes 
 - **Contraseña:** `Admin123`
 
 ¡La instalación ha finalizado! Ya puede explorar la aplicación.
+
+### 6. Verificar que los servicios estén corriendo
+
+```bash
+# Health checks
+curl http://localhost:8001/health  # User Service
+curl http://localhost:8002/health  # Patient Service
+curl http://localhost:8003/health  # Order Service
+curl http://localhost:8004/health  # Billing Service
+curl http://localhost:8005/health  # Configuration Service
+curl http://localhost:8000/health  # API Gateway
+```
+
+### 7. Acceder a la documentación API (Swagger UI)
+
+- **User Service:** http://localhost:8001/docs
+- **Patient Service:** http://localhost:8002/docs
+- **Order Service:** http://localhost:8003/docs
+- **Billing Service:** http://localhost:8004/docs
+- **Configuration Service:** http://localhost:8005/docs
+- **API Gateway:** http://localhost:8000/docs
+
+### 8. Acceso a la Aplicación Frontend
+
+Una vez que los servicios estén corriendo, puede acceder a la aplicación web a través del navegador:
+
+-   **Frontend:** [http://localhost:5173](http://localhost:5173)
+
+Para detalles específicos sobre las vistas a las que cada rol de usuario tiene acceso, consulte el [Manual de Usuario](MANUAL_DE_USUARIO.md).
